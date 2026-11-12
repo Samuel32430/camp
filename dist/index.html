@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Campamento Club Orión - 20m x 18m</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <script type="module" crossorigin src="/assets/index-DZ-vcbnw.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-BsWeyqZc.css">
+</head>
+<body>
+  <div id="canvas-container"></div>
+
+  <button id="btn-open-sidebar" class="btn-open-sidebar hidden" title="Mostrar Panel de Control">
+    Menú y Vistas
+  </button>
+
+  <header class="hud-header glass-panel">
+    <div class="header-left">
+      <div class="logo-badge">
+        <img src="/logo-orion.png" alt="Club Orión" class="logo-img">
+      </div>
+      <div>
+        <h1 class="header-title">Club Orión - Distribución de Campamento</h1>
+        <div class="header-badges">
+          <span class="badge badge-accent">20.00 m × 18.00 m (360 m²)</span>
+          <span class="badge">25 Carpas</span>
+          <span class="badge">8 Carpas Fondo</span>
+          <span class="badge badge-success">Pasadizos 1.50 m</span>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="time-selector">
+        <button id="btn-time-day" class="btn-time active" title="Día">Día</button>
+        <button id="btn-time-sunset" class="btn-time" title="Atardecer">Atardecer</button>
+        <button id="btn-time-night" class="btn-time" title="Noche">Noche</button>
+      </div>
+      <button id="btn-fullscreen" class="btn-fullscreen" title="Pantalla Completa">⛶ Pantalla Completa</button>
+    </div>
+  </header>
+
+  <aside id="hud-sidebar" class="hud-sidebar glass-panel">
+    <div class="sidebar-header">
+      <span class="section-title">Panel de Control</span>
+      <button id="btn-toggle-sidebar" class="btn-close-sidebar" title="Ocultar Panel">Ocultar</button>
+    </div>
+
+    <div class="hud-section">
+      <div class="section-title">Vistas de Cámara</div>
+      <div class="grid-buttons">
+        <button id="view-iso" class="btn-view active">Isométrica</button>
+        <button id="view-top" class="btn-view">Planta 2D</button>
+        <button id="view-front" class="btn-view">Portada</button>
+        <button id="view-patio" class="btn-view">Patio Central</button>
+      </div>
+      
+      <button id="btn-autorotate" class="btn-autorotate" title="Activar/Desactivar giro automático (Espacio)">
+        <span>Auto-rotación</span>
+      </button>
+
+      <button id="view-inside" class="btn-special">
+        <div class="btn-text-group">
+          <strong>Vista Interior de Carpa</strong>
+        </div>
+      </button>
+    </div>
+
+    <div class="hud-section">
+      <div class="section-title">Capas y Elementos</div>
+      <div class="toggle-list">
+        <label class="toggle-item">
+          <input type="checkbox" id="toggle-toldo" checked>
+          <span class="toggle-custom"></span>
+          <span class="toggle-label">Toldo Continuo</span>
+        </label>
+        <label class="toggle-item">
+          <input type="checkbox" id="toggle-cotas" checked>
+          <span class="toggle-custom"></span>
+          <span class="toggle-label">Cotas Técnicas</span>
+        </label>
+        <label class="toggle-item">
+          <input type="checkbox" id="toggle-zonas" checked>
+          <span class="toggle-custom"></span>
+          <span class="toggle-label">Límites y Zonas</span>
+        </label>
+        <label class="toggle-item">
+          <input type="checkbox" id="toggle-rotulos" checked>
+          <span class="toggle-custom"></span>
+          <span class="toggle-label">Etiquetas 3D</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="hud-section">
+      <div class="section-title">Distribución (360 m²)</div>
+      <div class="areas-table">
+        <div class="area-row">
+          <span class="area-dot dot-varones"></span>
+          <span class="area-name">Varones (4 fondo + 6 costado)</span>
+          <span class="area-val">10 carpas</span>
+        </div>
+        <div class="area-row">
+          <span class="area-dot dot-mujeres"></span>
+          <span class="area-name">Mujeres (4 fondo + 6 costado)</span>
+          <span class="area-val">10 carpas</span>
+        </div>
+        <div class="area-row">
+          <span class="area-dot dot-directiva"></span>
+          <span class="area-name">Directiva</span>
+          <span class="area-val">5 carpas</span>
+        </div>
+        <div class="area-row">
+          <span class="area-dot dot-servicios"></span>
+          <span class="area-name">Servicios (Tópico, Logística, Seguridad, Comunicaciones)</span>
+          <span class="area-val">4 módulos</span>
+        </div>
+        <div class="area-row">
+          <span class="area-dot dot-patio"></span>
+          <span class="area-name">Patio Formación</span>
+          <span class="area-val">6.80 m ancho</span>
+        </div>
+        <div class="area-row">
+          <span class="area-dot dot-pasajes"></span>
+          <span class="area-name">Pasadizos Horiz. y Vert.</span>
+          <span class="area-val">1.50 m c/u</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div id="inspector-card" class="inspector-card glass-panel hidden">
+    <div class="card-header">
+      <div class="card-header-text">
+        <h3 id="card-title">Módulo de Carpa</h3>
+        <span class="card-category" id="card-category">Zona Varones</span>
+      </div>
+      <button id="card-close" class="btn-close">×</button>
+    </div>
+    <div class="card-body">
+      <div class="card-specs" id="card-specs"></div>
+    </div>
+  </div>
+
+  <div id="inside-mode-bar" class="inside-mode-bar glass-panel hidden">
+    <div class="inside-info">
+      <strong>Vista Interior de Carpa</strong>
+    </div>
+    <button id="btn-exit-inside" class="btn-exit-inside">
+      Salir
+    </button>
+  </div>
+
+  <footer class="hud-footer glass-panel">
+    <div class="footer-hint">
+      <span class="hint-key">Clic + Arrastrar:</span> Rotar órbita
+    </div>
+    <div class="footer-hint">
+      <span class="hint-key">Rueda:</span> Zoom
+    </div>
+    <div class="footer-hint">
+      <span class="hint-key">Clic en elemento:</span> Ver medidas
+    </div>
+    <div class="footer-hint">
+      <span class="hint-key">Espacio:</span> Auto-rotar
+    </div>
+    <div class="footer-hint">
+      <span class="hint-key">Tecla H:</span> Ocultar/Mostrar menú
+    </div>
+  </footer>
+
+</body>
+</html>
