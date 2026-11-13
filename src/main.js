@@ -5,6 +5,7 @@ import { createTerrain } from './scene/terrain.js';
 import { createLights } from './scene/lights.js';
 import { createToldoYMastil } from './scene/toldo.js';
 import { createPortadaYCercado } from './models/portada.js';
+import { createBanderas } from './models/banderas.js';
 import { createCarpa } from './models/carpa.js';
 import { createServiciosFrontis } from './models/serviciosFrontis.js';
 import { createInteriorCarpa } from './models/interiorCarpa.js';
@@ -77,6 +78,10 @@ scene.add(interiorGroup);
 // H. Iluminación Nocturna (Guirnaldas de luces bajo la cubierta)
 const { lucesNocturnasGroup, setLucesNocturnasMode } = createLucesNocturnas();
 scene.add(lucesNocturnasGroup);
+
+// I. Banderas Ceremoniales frente a la Portada (Mástil Principal + Laterales)
+const { banderasGroup, updateBanderas } = createBanderas();
+scene.add(banderasGroup);
 
 // =========================================================
 // 3. DISTRIBUCIÓN MATEMÁTICA EXACTA DE LAS 25 CARPAS
@@ -239,6 +244,7 @@ const hud = setupHUD({
   toldoSubGroup,
   cotasGroup,
   zonesGroup,
+  banderasGroup,
   lightsController
 });
 
@@ -292,6 +298,9 @@ window.addEventListener('resize', () => {
 // ==========================================
 function animate() {
   requestAnimationFrame(animate);
+
+  const nowSec = performance.now() / 1000;
+  updateBanderas(nowSec);
 
   hud.updateCameraAnimation(performance.now());
   controls.update();

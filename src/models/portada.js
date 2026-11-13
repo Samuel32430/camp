@@ -313,6 +313,21 @@ export function createPortadaYCercado() {
     ctx.fillRect(148, 148, 590, 8);
 
     const tex = new THREE.CanvasTexture(canvas);
+    tex.minFilter = THREE.LinearFilter;
+
+    // Carga del logo oficial del Club Orión
+    const imgLogo = new Image();
+    imgLogo.crossOrigin = 'anonymous';
+    imgLogo.src = '/logo-orion.png';
+    imgLogo.onload = () => {
+      // Limpiar área del logo con fondo azul
+      ctx.fillStyle = '#1a3a8f';
+      ctx.fillRect(20, 20, 115, 150);
+      // Dibujar logo oficial
+      ctx.drawImage(imgLogo, 20, 22, 115, 146);
+      tex.needsUpdate = true;
+    };
+
     const frontPlane = new THREE.Mesh(
       new THREE.PlaneGeometry(width * 0.97, height * 0.90),
       new THREE.MeshBasicMaterial({ map: tex })
