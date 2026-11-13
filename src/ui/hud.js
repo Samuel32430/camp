@@ -10,6 +10,7 @@ export function setupHUD({
   toldoSubGroup,
   cotasGroup,
   zonesGroup,
+  banderasGroup,
   lightsController
 }) {
   const cameraAnim = {
@@ -34,6 +35,10 @@ export function setupHUD({
     front: {
       pos: new THREE.Vector3(0, 3.2, 16.5),
       target: new THREE.Vector3(0, 1.8, 8.8)
+    },
+    formacion: {
+      pos: new THREE.Vector3(0, 1.8, 1.5),
+      target: new THREE.Vector3(0, 2.0, 8.2)
     },
     patio: {
       pos: new THREE.Vector3(0, 2.2, -6.5),
@@ -93,6 +98,7 @@ export function setupHUD({
   document.getElementById('view-iso')?.addEventListener('click', () => transitionTo('iso'));
   document.getElementById('view-top')?.addEventListener('click', () => transitionTo('top'));
   document.getElementById('view-front')?.addEventListener('click', () => transitionTo('front'));
+  document.getElementById('view-formacion')?.addEventListener('click', () => transitionTo('formacion'));
   document.getElementById('view-patio')?.addEventListener('click', () => transitionTo('patio'));
   document.getElementById('view-inside')?.addEventListener('click', () => transitionTo('inside'));
   document.getElementById('btn-exit-inside')?.addEventListener('click', () => transitionTo('iso'));
@@ -215,6 +221,13 @@ export function setupHUD({
       cotasGroup.traverse(child => {
         if (child.isSprite) child.visible = e.target.checked;
       });
+    });
+  }
+
+  const toggleBanderas = document.getElementById('toggle-banderas');
+  if (toggleBanderas && banderasGroup) {
+    toggleBanderas.addEventListener('change', (e) => {
+      banderasGroup.visible = e.target.checked;
     });
   }
 
