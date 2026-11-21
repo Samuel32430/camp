@@ -101,109 +101,25 @@
 
     <div class="hud-section">
       <div class="section-title">Planificación</div>
-      <div class="planning-card">
-        <div class="planning-highlight">
-          <div class="highlight-num">8 a 10</div>
-          <div class="highlight-desc">
-            <strong>Chicos para levantar portada</strong>
-            <span>6 para trípodes (2 c/u) + 2 viga central + 2 vientos</span>
-          </div>
-        </div>
-        <div class="time-breakdown">
-          <div class="time-item">
-            <span class="time-label">🏗️ Armado Portada + Cerco:</span>
-            <span class="time-val">1h 30m – 2h 00m</span>
-          </div>
-          
-          <div class="time-item mt-2">
-            <span class="time-label">🔻 Bajada / Desarmado:</span>
-            <span class="time-val">30m – 45m</span>
-          </div>
-          
-        </div>
+      <div class="section-card-summary">
+        <p class="summary-text">Cuadrilla de 8 a 10 personas · Tiempos de armado y desmontaje</p>
+        <button id="btn-open-planificacion" class="btn-summary-action">Ver Planificación</button>
       </div>
     </div>
 
     <div class="hud-section">
-      <div class="section-title">🪵 Materiales (Palos y Drizas)</div>
-      <div class="materials-note">Valores referenciales para evaluación en reunión:</div>
-      <div class="materials-table">
-        <div class="material-row header">
-          <span>Elemento</span>
-          <span>Cant. / Largo</span>
-          <span>Diámetro</span>
-        </div>
-        <div class="material-row">
-          <span class="mat-name">Palos trípode</span>
-          <span>9 unids · 3.50 m</span>
-          <span class="mat-d">Ø 10–12 cm</span>
-        </div>
-        <div class="material-row">
-          <span class="mat-name">Viga travesaño</span>
-          <span>1 unid · 5.80 m</span>
-          <span class="mat-d">Ø 10–12 cm</span>
-        </div>
-        <div class="material-row">
-          <span class="mat-name">Estacas cerco</span>
-          <span>12 unids · 1.20 m</span>
-          <span class="mat-d">Ø 3–4 cm</span>
-        </div>
-        <div class="material-row">
-          <span class="mat-name">Mástiles banderas</span>
-          <span>3 unids · 4.00 m</span>
-          <span class="mat-d">Ø 5–6 cm</span>
-        </div>
-        <div class="material-row">
-          <span class="mat-name">Driza portada</span>
-          <span>≈ 25–30 m (amarres)</span>
-          <span class="mat-d">Ø 6–8 mm</span>
-        </div>
-        <div class="material-row">
-          <span class="mat-name">Driza cerco</span>
-          <span>≈ 50 m (3 niveles)</span>
-          <span class="mat-d">Ø 4–6 mm</span>
-        </div>
-        <div class="material-row highlight-row">
-          <span class="mat-name">Medida portada</span>
-          <span>Frontal: 5.20 m</span>
-          <span class="mat-d">Alto máx: 3.00 m</span>
-        </div>
+      <div class="section-title">Materiales y Estructura</div>
+      <div class="section-card-summary">
+        <p class="summary-text">Troncos pioneros, travesaño, mástiles y drizas</p>
+        <button id="btn-open-materiales" class="btn-summary-action">Ver Tabla de Materiales</button>
       </div>
     </div>
 
     <div class="hud-section">
-      <div class="section-title">Distribución (360 m²)</div>
-      <div class="areas-table">
-        <div class="area-row">
-          <span class="area-dot dot-varones"></span>
-          <span class="area-name">Varones (4 fondo + 6 costado)</span>
-          <span class="area-val">10 carpas</span>
-        </div>
-        <div class="area-row">
-          <span class="area-dot dot-mujeres"></span>
-          <span class="area-name">Mujeres (4 fondo + 6 costado)</span>
-          <span class="area-val">10 carpas</span>
-        </div>
-        <div class="area-row">
-          <span class="area-dot dot-directiva"></span>
-          <span class="area-name">Directiva</span>
-          <span class="area-val">5 carpas</span>
-        </div>
-        <div class="area-row">
-          <span class="area-dot dot-servicios"></span>
-          <span class="area-name">Servicios (Tópico, Logística, Seguridad, Comunicaciones)</span>
-          <span class="area-val">4 módulos</span>
-        </div>
-        <div class="area-row">
-          <span class="area-dot dot-patio"></span>
-          <span class="area-name">Patio Formación</span>
-          <span class="area-val">6.80 m ancho</span>
-        </div>
-        <div class="area-row">
-          <span class="area-dot dot-pasajes"></span>
-          <span class="area-name">Pasadizos Horiz. y Vert.</span>
-          <span class="area-val">1.50 m c/u</span>
-        </div>
+      <div class="section-title">Distribución del Terreno</div>
+      <div class="section-card-summary">
+        <p class="summary-text">360 m² · 25 carpas organizadas por clases y directiva</p>
+        <button id="btn-open-distribucion" class="btn-summary-action">Ver Distribución y Clases</button>
       </div>
     </div>
   </aside>
@@ -247,6 +163,214 @@
       <span class="hint-key">Tecla H:</span> Ocultar/Mostrar menú
     </div>
   </footer>
+
+  <!-- Modal Unificado de Información Técnica -->
+  <div id="info-modal-backdrop" class="modal-backdrop hidden">
+    <div class="info-modal glass-panel">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <h2 class="modal-title">Ficha Técnica — Club Orión</h2>
+          <span class="modal-subtitle">Campamento Oficial 20.00 m × 18.00 m (360 m²)</span>
+        </div>
+        <button id="btn-close-modal" class="btn-modal-close" title="Cerrar (Esc)">×</button>
+      </div>
+
+      <!-- Pestañas del Modal -->
+      <div class="modal-tabs">
+        <button class="modal-tab-btn active" data-tab="tab-planificacion">Planificación</button>
+        <button class="modal-tab-btn" data-tab="tab-materiales">Materiales y Palos</button>
+        <button class="modal-tab-btn" data-tab="tab-distribucion">Distribución y Clases</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- PESTAÑA 1: PLANIFICACIÓN -->
+        <div id="tab-planificacion" class="modal-tab-content active">
+          <div class="modal-planning-grid">
+            <div class="planning-stat-card">
+              <span class="stat-badge">Cuadrilla Recomendada</span>
+              <div class="stat-number">8 a 10</div>
+              <div class="stat-caption">Chicos para levantar portada</div>
+              <p class="stat-desc">6 para trípodes (3 por cada trípode) + 2 para viga central + 2 para vientos y fijación.</p>
+            </div>
+
+            <div class="planning-stat-card">
+              <span class="stat-badge">Tiempos Operativos</span>
+              <div class="stat-timeline">
+                <div class="timeline-row">
+                  <span class="timeline-label">Armado Portada + Cerco:</span>
+                  <span class="timeline-val">1h 30m – 2h 00m</span>
+                </div>
+                <div class="timeline-row mt-3">
+                  <span class="timeline-label">Bajada / Desarmado:</span>
+                  <span class="timeline-val">30m – 45m</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PESTAÑA 2: MATERIALES -->
+        <div id="tab-materiales" class="modal-tab-content">
+          <p class="modal-tab-note">Especificaciones de maderas, travesaño, mástiles y drizas para evaluación técnica:</p>
+          <div class="modal-table-container">
+            <table class="modal-table">
+              <thead>
+                <tr>
+                  <th>Elemento</th>
+                  <th>Cantidad y Largo</th>
+                  <th>Grosor / Diámetro</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="col-name">Palos trípodes principales</td>
+                  <td>6 unidades · 3.50 m</td>
+                  <td class="col-spec">10 a 12 cm</td>
+                </tr>
+                <tr>
+                  <td class="col-name">Palos diagonales cruzados (X)</td>
+                  <td>2 unidades · 4.80 m</td>
+                  <td class="col-spec">10 a 12 cm</td>
+                </tr>
+                <tr>
+                  <td class="col-name">Viga travesaño</td>
+                  <td>1 unidad · 5.80 m</td>
+                  <td class="col-spec">10 a 12 cm</td>
+                </tr>
+                <tr>
+                  <td class="col-name">Mástiles para banderas en trípodes</td>
+                  <td>2 unidades · 4.30 m</td>
+                  <td class="col-spec">5 a 6 cm</td>
+                </tr>
+                <tr>
+                  <td class="col-name">Estacas cerco frontal</td>
+                  <td>12 unidades · 1.20 m</td>
+                  <td class="col-spec">3 a 4 cm</td>
+                </tr>
+                <tr>
+                  <td class="col-name">Driza portada (amarres)</td>
+                  <td>≈ 30 m de driza</td>
+                  <td class="col-spec">6 a 8 mm</td>
+                </tr>
+                <tr>
+                  <td class="col-name">Driza cerco frontal (3 niveles)</td>
+                  <td>≈ 50 m de driza</td>
+                  <td class="col-spec">4 a 6 mm</td>
+                </tr>
+                <tr class="row-highlight">
+                  <td class="col-name">Medidas de la portada</td>
+                  <td>Frontal útil: 5.20 m</td>
+                  <td class="col-spec">Altura útil: 3.00 m</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- PESTAÑA 3: DISTRIBUCIÓN -->
+        <div id="tab-distribucion" class="modal-tab-content">
+          <h3 class="modal-section-h3">Asignación Oficial de Carpas por Clases Scout</h3>
+          <p class="modal-tab-note">Distribución matemática desde el frontis (+Z) hacia el fondo (-Z):</p>
+          
+          <div class="classes-grid">
+            <div class="class-card border-compañero">
+              <div class="class-header">
+                <span class="class-dot bg-compañero"></span>
+                <strong class="class-name">Compañero (Rojo)</strong>
+              </div>
+              <div class="class-detail">
+                <span>2 Varones · 1 Mujeres</span>
+                <strong>3 carpas</strong>
+              </div>
+            </div>
+
+            <div class="class-card border-explorador">
+              <div class="class-header">
+                <span class="class-dot bg-explorador"></span>
+                <strong class="class-name">Explorador (Verde)</strong>
+              </div>
+              <div class="class-detail">
+                <span>1 Varones · 2 Mujeres</span>
+                <strong>3 carpas</strong>
+              </div>
+            </div>
+
+            <div class="class-card border-pionero">
+              <div class="class-header">
+                <span class="class-dot bg-pionero"></span>
+                <strong class="class-name">Pionero (Plata)</strong>
+              </div>
+              <div class="class-detail">
+                <span>1 Varones · 2 Mujeres</span>
+                <strong>3 carpas</strong>
+              </div>
+            </div>
+
+            <div class="class-card border-excursionista">
+              <div class="class-header">
+                <span class="class-dot bg-excursionista"></span>
+                <strong class="class-name">Excursionista (Morado)</strong>
+              </div>
+              <div class="class-detail">
+                <span>3 Varones · 3 Mujeres</span>
+                <strong>6 carpas</strong>
+              </div>
+            </div>
+
+            <div class="class-card border-guia">
+              <div class="class-header">
+                <span class="class-dot bg-guia"></span>
+                <strong class="class-name">Guía (Amarillo)</strong>
+              </div>
+              <div class="class-detail">
+                <span>1 Varones · 1 Mujeres</span>
+                <strong>2 carpas</strong>
+              </div>
+            </div>
+
+            <div class="class-card border-reserva">
+              <div class="class-header">
+                <span class="class-dot bg-reserva"></span>
+                <strong class="class-name">Reserva / Sobrantes</strong>
+              </div>
+              <div class="class-detail">
+                <span>2 Varones · 1 Mujeres</span>
+                <strong>3 carpas</strong>
+              </div>
+            </div>
+          </div>
+
+          <h3 class="modal-section-h3 mt-4">Zonificación General del Terreno</h3>
+          <div class="areas-grid-modal">
+            <div class="area-item-modal">
+              <span class="area-dot dot-varones"></span>
+              <span>Sector Varones (10 carpas)</span>
+            </div>
+            <div class="area-item-modal">
+              <span class="area-dot dot-mujeres"></span>
+              <span>Sector Mujeres (10 carpas)</span>
+            </div>
+            <div class="area-item-modal">
+              <span class="area-dot dot-directiva"></span>
+              <span>Directiva y Jefatura (5 carpas)</span>
+            </div>
+            <div class="area-item-modal">
+              <span class="area-dot dot-servicios"></span>
+              <span>Servicios Frontis (Tópico, Seguridad, Logística, Comunicaciones)</span>
+            </div>
+            <div class="area-item-modal">
+              <span class="area-dot dot-patio"></span>
+              <span>Patio Central de Formación (6.80 m libres)</span>
+            </div>
+            <div class="area-item-modal">
+              <span class="area-dot dot-pasajes"></span>
+              <span>Pasadizos Perimetrales y Transversales (1.50 m libres)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script type="module" src="./src/main.js"></script>
 </body>

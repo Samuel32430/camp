@@ -279,5 +279,69 @@ export function setupHUD({
     card.classList.remove('hidden');
   }
 
-  return { updateCameraAnimation, transitionTo, showInspector };
+  // ==========================================
+  // MODAL UNIFICADO (PLANIFICACIÓN, MATERIALES, DISTRIBUCIÓN)
+  // ==========================================
+  const modalBackdrop = document.getElementById('info-modal-backdrop');
+  const btnCloseModal = document.getElementById('btn-close-modal');
+
+  function openModalTab(tabId) {
+    if (!modalBackdrop) return;
+    modalBackdrop.classList.remove('hidden');
+
+    document.querySelectorAll('.modal-tab-btn').forEach(btn => {
+      if (btn.dataset.tab === tabId) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
+    document.querySelectorAll('.modal-tab-content').forEach(content => {
+      if (content.id === tabId) {
+        content.classList.add('active');
+      } else {
+        content.classList.remove('active');
+      }
+    });
+  }
+
+  function closeModal() {
+    modalBackdrop?.classList.add('hidden');
+  }
+
+  document.getElementById('btn-open-planificacion')?.addEventListener('click', () => {
+    openModalTab('tab-planificacion');
+  });
+
+  document.getElementById('btn-open-materiales')?.addEventListener('click', () => {
+    openModalTab('tab-materiales');
+  });
+
+  document.getElementById('btn-open-distribucion')?.addEventListener('click', () => {
+    openModalTab('tab-distribucion');
+  });
+
+  btnCloseModal?.addEventListener('click', closeModal);
+
+  modalBackdrop?.addEventListener('click', (e) => {
+    if (e.target === modalBackdrop) {
+      closeModal();
+    }
+  });
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeModal();
+    }
+  });
+
+  document.querySelectorAll('.modal-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetTab = btn.dataset.tab;
+      if (targetTab) openModalTab(targetTab);
+    });
+  });
+
+  return { updateCameraAnimation, transitionTo, showInspector, openModalTab, closeModal };
 }
