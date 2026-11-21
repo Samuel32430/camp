@@ -2,28 +2,25 @@ import * as THREE from 'three';
 import { ORION_COLORS } from './portada.js';
 
 /**
- * Banderas del Club Orión frente a la portada.
- * La formación del club se ubica en el patio central mirando hacia la portada (+Z).
- * Por lo tanto, las banderas se sitúan en el frente ceremonial de la portada
- * (entre el patio de formación y la portada, en Z ≈ 7.8m - 8.1m), para que toda la
- * formación las tenga de frente durante los devocionales y ceremonias de izamiento.
- *
- *   - Mástil Central:   X =  0.0, Z = 7.8  (Mástil Principal con Bandera Oficial Club Orión)
- *   - Mástil Izquierdo: X = -3.2, Z = 8.1  (Bandera Nacional / Bienvenida)
- *   - Mástil Derecho:   X = +3.2, Z = 8.1  (Bandera Conquistadores / Camporee)
+ * Banderas oficiales integradas a los trípodes de la portada:
+ *   - Trípode Izquierdo (X = -2.60 m, Z = 8.95 m): Bandera Oficial Club Orión
+ *   - Trípode Derecho   (X = +2.60 m, Z = 8.95 m): Bandera Nacional del Perú
+ * 
+ * Ambos mástiles van adosados y amarrados como parte de la estructura pionera de los trípodes,
+ * elevándose hasta 4.30 m de altura con animación física de viento.
  */
 
-const MASTIL_H = 4.0;
-const MASTIL_R = 0.030;
+const MASTIL_H = 4.30;
+const MASTIL_R = 0.035;
 
 const FLAG_W = 1.30;
 const FLAG_H = 0.80;
-const FLAG_SEGS_X = 12;
-const FLAG_SEGS_Y = 6;
+const FLAG_SEGS_X = 14;
+const FLAG_SEGS_Y = 7;
 
-const flagMeshes = [];
+let flagMeshes = [];
 
-function createMastilConBandera(parentGroup, x, z, flagType = 'principal') {
+function createMastilConBandera(parentGroup, x, z, flagType = 'orion') {
   const group = new THREE.Group();
   group.position.set(x, 0, z);
 
@@ -34,27 +31,25 @@ function createMastilConBandera(parentGroup, x, z, flagType = 'principal') {
     metalness: 0.05
   });
   const mastil = new THREE.Mesh(
-    new THREE.CylinderGeometry(MASTIL_R * 0.8, MASTIL_R, MASTIL_H, 12),
+    new THREE.CylinderGeometry(MASTIL_R * 0.85, MASTIL_R * 1.1, MASTIL_H, 12),
     mastilMat
   );
   mastil.position.y = MASTIL_H / 2;
   mastil.castShadow = true;
   group.add(mastil);
 
-  // Base de soporte pionera (3 estacas cruzadas en la base)
-  const baseStakeGeo = new THREE.CylinderGeometry(0.02, 0.02, 0.7, 6);
-  const baseStakeMat = new THREE.MeshStandardMaterial({ color: 0x503010, roughness: 0.9 });
-  for (let i = 0; i < 3; i++) {
-    const angle = (i * 2 * Math.PI) / 3;
-    const baseStake = new THREE.Mesh(baseStakeGeo, baseStakeMat);
-    baseStake.position.set(Math.cos(angle) * 0.25, 0.25, Math.sin(angle) * 0.25);
-    baseStake.rotation.set(Math.sin(angle) * 0.4, 0, -Math.cos(angle) * 0.4);
-    group.add(baseStake);
+  // Amarres de sujeción al trípode (a 1.2m y 2.6m de altura)
+  const ropeMat = new THREE.MeshStandardMaterial({ color: 0xfef08a, roughness: 0.9 });
+  for (const hy of [1.2, 2.65]) {
+    const lash = new THREE.Mesh(new THREE.TorusGeometry(MASTIL_R + 0.03, 0.015, 6, 12), ropeMat);
+    lash.position.y = hy;
+    lash.rotation.x = Math.PI / 2;
+    group.add(lash);
   }
 
   // Remate superior (pomo dorado)
   const remate = new THREE.Mesh(
-    new THREE.SphereGeometry(0.06, 12, 12),
+    new THREE.SphereGeometry(0.065, 12, 12),
     new THREE.MeshStandardMaterial({
       color: ORION_COLORS.amarillo,
       roughness: 0.35,
@@ -65,71 +60,79 @@ function createMastilConBandera(parentGroup, x, z, flagType = 'principal') {
   group.add(remate);
 
   // Driza del mástil (cuerda para izar)
-  const ropeMat = new THREE.LineBasicMaterial({ color: 0xfef08a });
+  const ropeLineMat = new THREE.LineBasicMaterial({ color: 0xfef08a });
   const ropeGeo = new THREE.BufferGeometry().setFromPoints([
-    new THREE.Vector3(MASTIL_R + 0.01, MASTIL_H - 0.05, 0),
-    new THREE.Vector3(MASTIL_R + 0.01, 1.2, 0)
+    new THREE.Vector3(MASTIL_R + 0.012, MASTIL_H - 0.05, 0),
+    new THREE.Vector3(MASTIL_R + 0.012, 1.1, 0)
   ]);
-  group.add(new THREE.Line(ropeGeo, ropeMat));
+  group.add(new THREE.Line(ropeGeo, ropeLineMat));
 
-  // ── Bandera con Textura Canvas y Logo Oficial ─────────────────────────────
+  // ── Textura Canvas para la bandera ────────────────────────────────────────
   const canvas = document.createElement('canvas');
   canvas.width = 512;
   canvas.height = 320;
   const ctx = canvas.getContext('2d');
 
   function drawFlagDesign() {
-    if (flagType === 'principal') {
-      // Fondo dividido diagonalmente azul y verde con franja blanca y amarilla
-      ctx.fillStyle = '#1a3a8f'; // Azul Orión
+    if (flagType === 'peru') {
+      // ── Bandera Oficial del Perú (3 franjas verticales: Rojo - Blanco - Rojo)
+      const stripeW = 512 / 3;
+      ctx.fillStyle = '#d91023'; // Rojo bermellón
+      ctx.fillRect(0, 0, stripeW, 320);
+
+      ctx.fillStyle = '#ffffff'; // Blanco institucional
+      ctx.fillRect(stripeW, 0, stripeW, 320);
+
+      ctx.fillStyle = '#d91023'; // Rojo bermellón
+      ctx.fillRect(stripeW * 2, 0, stripeW, 320);
+
+      // Borde ceremonial dorado fino
+      ctx.strokeStyle = '#f5c518';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(2, 2, 508, 316);
+
+      // Sombra sutil de costura interior
+      ctx.strokeStyle = 'rgba(0,0,0,0.12)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(stripeW, 0); ctx.lineTo(stripeW, 320);
+      ctx.moveTo(stripeW * 2, 0); ctx.lineTo(stripeW * 2, 320);
+      ctx.stroke();
+    } else {
+      // ── Bandera Oficial del Club Orión
+      ctx.fillStyle = '#1a3a8f'; // Azul Orión superior
       ctx.fillRect(0, 0, 512, 320);
 
-      // Franja verde inferior
-      ctx.fillStyle = '#1a7a3f'; // Verde Orión
-      ctx.beginPath();
-      ctx.moveTo(0, 160);
-      ctx.lineTo(512, 160);
-      ctx.lineTo(512, 320);
-      ctx.lineTo(0, 320);
-      ctx.closePath();
-      ctx.fill();
+      // Mitad inferior Verde Orión
+      ctx.fillStyle = '#1a7a3f';
+      ctx.fillRect(0, 160, 512, 160);
 
       // Franja amarilla intermedia
       ctx.fillStyle = '#f5c518';
-      ctx.fillRect(0, 150, 512, 18);
+      ctx.fillRect(0, 150, 512, 20);
 
       // Borde blanco institucional
       ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 10;
-      ctx.strokeRect(6, 6, 500, 308);
+      ctx.lineWidth = 8;
+      ctx.strokeRect(5, 5, 502, 310);
 
-      // Texto
+      // Textos institucionales
       ctx.fillStyle = '#f5c518';
-      ctx.font = 'bold 38px "Plus Jakarta Sans", sans-serif';
+      ctx.font = 'bold 36px "Plus Jakarta Sans", sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText('CLUB DE CONQUISTADORES', 256, 50);
+      ctx.fillText('CLUB DE CONQUISTADORES', 256, 52);
 
       ctx.fillStyle = '#ffffff';
-      ctx.font = '800 58px "Plus Jakarta Sans", sans-serif';
-      ctx.fillText('ORIÓN', 256, 105);
+      ctx.font = '800 52px "Plus Jakarta Sans", sans-serif';
+      ctx.fillText('ORIÓN', 256, 106);
 
-      ctx.font = '600 24px "JetBrains Mono", monospace';
-      ctx.fillStyle = '#ffffff';
-      ctx.fillText('★ SERVICIO · VALOR · FE ★', 256, 245);
-    } else {
-      // Bandera bicolor lateral (Verde y Azul con estrella dorada)
-      ctx.fillStyle = '#1a7a3f';
-      ctx.fillRect(0, 0, 256, 320);
-      ctx.fillStyle = '#1a3a8f';
-      ctx.fillRect(256, 0, 256, 320);
-
-      // Estrella central
+      // Estrella central amarilla de 5 puntas
       ctx.save();
-      ctx.translate(256, 160);
+      ctx.translate(256, 235);
       ctx.beginPath();
       for (let i = 0; i < 5; i++) {
-        const rOuter = 85, rInner = 36;
+        const rOuter = 55, rInner = 24;
         const a = -Math.PI / 2 + (i * 2 * Math.PI / 5);
         const aI = a + Math.PI / 5;
         if (i === 0) ctx.moveTo(Math.cos(a) * rOuter, Math.sin(a) * rOuter);
@@ -139,14 +142,10 @@ function createMastilConBandera(parentGroup, x, z, flagType = 'principal') {
       ctx.closePath();
       ctx.fillStyle = '#f5c518';
       ctx.fill();
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 4;
+      ctx.strokeStyle = '#c8a000';
+      ctx.lineWidth = 2.5;
       ctx.stroke();
       ctx.restore();
-
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 8;
-      ctx.strokeRect(5, 5, 502, 310);
     }
   }
 
@@ -155,18 +154,17 @@ function createMastilConBandera(parentGroup, x, z, flagType = 'principal') {
   const flagTex = new THREE.CanvasTexture(canvas);
   flagTex.minFilter = THREE.LinearFilter;
 
-  // Carga asíncrona del logo real subido por el usuario
-  const imgLogo = new Image();
-  imgLogo.crossOrigin = 'anonymous';
-  imgLogo.src = '/logo-orion.png';
-  imgLogo.onload = () => {
-    if (flagType === 'principal') {
+  // Carga asíncrona del logo para la bandera del Club Orión
+  if (flagType === 'orion') {
+    const imgLogo = new Image();
+    imgLogo.crossOrigin = 'anonymous';
+    imgLogo.src = '/logo-orion.png';
+    imgLogo.onload = () => {
       drawFlagDesign();
-      // Dibujar logo oficial en el centro de la bandera
-      ctx.drawImage(imgLogo, 206, 158, 100, 100);
+      ctx.drawImage(imgLogo, 206, 185, 100, 100);
       flagTex.needsUpdate = true;
-    }
-  };
+    };
+  }
 
   const flagMat = new THREE.MeshStandardMaterial({
     map: flagTex,
@@ -178,24 +176,29 @@ function createMastilConBandera(parentGroup, x, z, flagType = 'principal') {
   const flagGeo = new THREE.PlaneGeometry(FLAG_W, FLAG_H, FLAG_SEGS_X, FLAG_SEGS_Y);
   const flagMesh = new THREE.Mesh(flagGeo, flagMat);
 
-  // Orientar la bandera ondeando hacia un lado
-  flagMesh.position.set(FLAG_W / 2 + MASTIL_R, MASTIL_H - FLAG_H / 2 - 0.08, 0);
+  // Orientar la bandera ondeando hacia afuera del pórtico para no obstruir el centro
+  const dirX = x < 0 ? -1 : 1;
+  flagMesh.position.set(dirX * (FLAG_W / 2 + MASTIL_R), MASTIL_H - FLAG_H / 2 - 0.10, 0);
+  if (dirX < 0) {
+    // Si apunta hacia -X, invertir rotación para que el diseño mire correctamente
+    flagMesh.rotation.y = Math.PI;
+  }
   flagMesh.castShadow = true;
   group.add(flagMesh);
 
-  flagMeshes.push(flagMesh);
+  flagMeshes.push({ mesh: flagMesh, dirX });
 
   // Inspector userData
   group.userData = {
-    title: flagType === 'principal' ? 'Mástil Principal — Bandera Club Orión' : 'Mástil Lateral de Formación',
-    category: 'Ceremonial',
-    desc: 'Ubicado al frente de la portada, de cara a la formación en el patio central.',
+    title: flagType === 'peru' ? 'Mástil Derecho — Bandera Nacional de Perú' : 'Mástil Izquierdo — Bandera Club Orión',
+    category: 'Ceremonial en Portada',
+    desc: 'Mástil de 4.30 m adosado al trípode pionero con driza de izamiento y bandera ondeando con viento.',
     specs: [
-      { label: 'Ubicación',        val: `X: ${x >= 0 ? '+' : ''}${x.toFixed(1)}m · Z: +${z.toFixed(1)}m` },
+      { label: 'Ubicación',        val: flagType === 'peru' ? 'Trípode Derecho (X: +2.60m)' : 'Trípode Izquierdo (X: -2.60m)' },
       { label: 'Altura mástil',    val: `${MASTIL_H.toFixed(2)} m` },
-      { label: 'Diámetro mástil',  val: 'Ø 6 cm (Madera tratada)' },
+      { label: 'Diámetro mástil',  val: '5 a 6 cm (Madera tratada)' },
       { label: 'Medidas bandera',  val: `${FLAG_W.toFixed(2)} m × ${FLAG_H.toFixed(2)} m` },
-      { label: 'Orientación',      val: 'Visible para formación en patio' }
+      { label: 'Tipo ceremonial',  val: flagType === 'peru' ? 'Pabellón Nacional' : 'Emblema Institucional' }
     ]
   };
 
@@ -204,18 +207,19 @@ function createMastilConBandera(parentGroup, x, z, flagType = 'principal') {
 }
 
 /**
- * Crea el conjunto de mástiles con banderas frente a la portada.
+ * Crea las 2 banderas integradas a los trípodes de la portada:
+ * Club Orión a la izquierda y Bandera de Perú a la derecha.
  */
 export function createBanderas() {
   const banderasGroup = new THREE.Group();
   banderasGroup.name = 'BanderasGroup';
+  flagMeshes = [];
 
-  // Mástil central en eje principal frente a la portada
-  createMastilConBandera(banderasGroup,  0.0, 7.8, 'principal');
+  // Mástil Trípode Izquierdo: Bandera Club Orión (X = -2.60 m, Z = 8.95 m)
+  createMastilConBandera(banderasGroup, -2.60, 8.95, 'orion');
 
-  // Mástiles laterales flanqueando el ingreso hacia la formación
-  createMastilConBandera(banderasGroup, -3.2, 8.1, 'lateral');
-  createMastilConBandera(banderasGroup,  3.2, 8.1, 'lateral');
+  // Mástil Trípode Derecho: Bandera de Perú (X = +2.60 m, Z = 8.95 m)
+  createMastilConBandera(banderasGroup,  2.60, 8.95, 'peru');
 
   return { banderasGroup, updateBanderas };
 }
@@ -225,27 +229,28 @@ export function createBanderas() {
  */
 export function updateBanderas(timeSec) {
   for (let m = 0; m < flagMeshes.length; m++) {
-    const mesh = flagMeshes[m];
+    const { mesh, dirX } = flagMeshes[m];
     const pos = mesh.geometry.attributes.position;
     const cols = FLAG_SEGS_X + 1;
     const rows = FLAG_SEGS_Y + 1;
 
-    // Pequeño desfase de viento entre banderas
-    const phaseOffset = m * 0.85;
+    const phaseOffset = m * 1.2;
 
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
         const idx = r * cols + c;
-        const normX = c / FLAG_SEGS_X; // 0 en el mástil, 1 en extremo libre
+        // La bandera está anclada en el borde junto al mástil
+        // En PlaneGeometry centrado, el borde en c=0 o c=cols-1 según dirX
+        const normX = c / FLAG_SEGS_X; // 0 a 1
 
-        // Vértices sujetos al mástil (c=0) no se mueven
+        // Fijar el borde adyacente al mástil
         if (c === 0) {
           pos.setZ(idx, 0);
           continue;
         }
 
-        const wave1 = Math.sin(timeSec * 3.2 + normX * 4.2 + phaseOffset) * (0.07 * normX);
-        const wave2 = Math.cos(timeSec * 2.1 + normX * 2.8 + r * 0.4) * (0.03 * normX);
+        const wave1 = Math.sin(timeSec * 3.4 + normX * 4.5 + phaseOffset) * (0.08 * normX);
+        const wave2 = Math.cos(timeSec * 2.2 + normX * 3.0 + r * 0.3) * (0.035 * normX);
         pos.setZ(idx, wave1 + wave2);
       }
     }
@@ -253,3 +258,4 @@ export function updateBanderas(timeSec) {
     mesh.geometry.computeVertexNormals();
   }
 }
+

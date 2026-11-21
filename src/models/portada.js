@@ -18,12 +18,22 @@ export const ORION_COLORS = {
 
 // ── Especificaciones técnicas (editables para la presentación) ───────────────
 export const PORTADA_SPECS = {
-  // Trípodes
+  // Trípodes principales
   palosTripodesLargo:   '3.60 m',
   palosTripodesD:       'Ø 10–12 cm',
-  cantTripodesTotal:    9,            // 3 trípodes × 3 palos
+  cantTripodesTotal:    6,            // 2 trípodes laterales × 3 palos
 
-  // Travesaño
+  // Palos diagonales cruzados en "X"
+  palosDiagonalesLargo: '4.80 m',
+  palosDiagonalesD:     'Ø 10–12 cm',
+  cantDiagonales:       2,
+
+  // Mástiles integrados para banderas
+  mastilesLargo:        '4.30 m',
+  mastilesD:            'Ø 5–6 cm',
+  cantMastiles:         2,
+
+  // Travesaño superior
   travesañoLargo:       '5.80 m',
   travesañoD:           'Ø 10–12 cm',
   cantTravesaño:        1,
@@ -33,8 +43,8 @@ export const PORTADA_SPECS = {
   estacasD:             'Ø 3–4 cm',
   cantEstacas:          12,
 
-  // Driza portada (amarres de trípodes y travesaño)
-  drizaPortadaTotal:    '≈ 25 m',
+  // Driza portada (amarres de trípodes, diagonales y travesaño)
+  drizaPortadaTotal:    '≈ 30 m',
   drizaPortadaD:        'Ø 6–8 mm',
 
   // Driza cerco (3 niveles × 2 tramos)
@@ -109,12 +119,28 @@ export function createPortadaYCercado() {
     return tGroup;
   }
 
-  // 3 Trípodes: Izquierdo, Central, Derecho
+  // ── Función para crear un tronco entre dos puntos 3D ──────────────────────
+  function createPioneerLogBetweenPoints(p1, p2, radius = 0.065, material = woodMat) {
+    const dir = new THREE.Vector3().subVectors(p2, p1);
+    const len = dir.length();
+    const geo = new THREE.CylinderGeometry(radius * 0.9, radius * 1.05, len, 8);
+    const mesh = new THREE.Mesh(geo, material);
+    const mid = new THREE.Vector3().addVectors(p1, p2).multiplyScalar(0.5);
+    mesh.position.copy(mid);
+
+    const up = new THREE.Vector3(0, 1, 0);
+    const quat = new THREE.Quaternion().setFromUnitVectors(up, dir.clone().normalize());
+    mesh.quaternion.copy(quat);
+    mesh.castShadow = true;
+    return mesh;
+  }
+
+  // 2 Trípodes principales en los laterales (Izquierdo y Derecho)
+  // Sin trípode central, dejando el ingreso central expedito
   portadaGroup.add(createPioneerTripod(-2.6));
-  portadaGroup.add(createPioneerTripod(0));
   portadaGroup.add(createPioneerTripod(2.6));
 
-  // Viga travesaño horizontal superior (5.8 m de largo)
+  // Viga travesaño horizontal superior (5.8 m de largo a 2.65 m de altura)
   const beamGeo = new THREE.CylinderGeometry(logR * 0.9, logR * 0.9, 5.8, 8);
   const beam = new THREE.Mesh(beamGeo, woodMat);
   beam.rotation.z = Math.PI / 2;
@@ -122,102 +148,93 @@ export function createPortadaYCercado() {
   beam.castShadow = true;
   portadaGroup.add(beam);
 
-  // Amarres en cada trípode sobre la viga
-  for (const bx of [-2.6, 0, 2.6]) {
-    const k = new THREE.Mesh(new THREE.CylinderGeometry(0.10, 0.10, 0.18, 8), ropeMat);
+  // Amarres en cada trípode sobre la viga travesaño
+  for (const bx of [-2.6, 2.6]) {
+    const k = new THREE.Mesh(new THREE.CylinderGeometry(0.10, 0.10, 0.22, 8), ropeMat);
     k.rotation.z = Math.PI / 2;
     k.position.set(bx, tripodH - 0.15, 0);
     portadaGroup.add(k);
   }
 
-  // ── Telas decorativas laterales (colores Club Orión) ──────────────────────
-  // Tela izquierda: azul con franja verde
-  const telaIzqMat = new THREE.MeshStandardMaterial({
-    color: ORION_COLORS.azul,
-    side: THREE.DoubleSide,
-    roughness: 0.85
-  });
-  const telaIzq = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 1.6), telaIzqMat);
-  telaIzq.position.set(-3.35, tripodH - 1.1, 0.05);
-  telaIzq.castShadow = false;
-  portadaGroup.add(telaIzq);
+  // ── Dos palos largos cruzados en diagonal ("X") formando el arco central ──
+  // Diagonal 1: Nace en base del trípode izquierdo (-2.30, 0.30) y sube hacia la cúspide derecha (+1.60, 3.60)
+  const diag1 = createPioneerLogBetweenPoints(
+    new THREE.Vector3(-2.30, 0.30, 0.05),
+    new THREE.Vector3( 1.60, 3.65, 0.05),
+    logR * 0.92
+  );
+  portadaGroup.add(diag1);
 
-  // Franja verde en tela izquierda
-  const franjaIzqMat = new THREE.MeshStandardMaterial({
-    color: ORION_COLORS.verde,
-    side: THREE.DoubleSide,
-    roughness: 0.85
-  });
-  const franjaIzq = new THREE.Mesh(new THREE.PlaneGeometry(0.15, 1.6), franjaIzqMat);
-  franjaIzq.position.set(-2.95, tripodH - 1.1, 0.06);
-  portadaGroup.add(franjaIzq);
+  // Diagonal 2: Nace en base del trípode derecho (+2.30, 0.30) y sube hacia la cúspide izquierda (-1.60, 3.60)
+  const diag2 = createPioneerLogBetweenPoints(
+    new THREE.Vector3( 2.30, 0.30, -0.05),
+    new THREE.Vector3(-1.60, 3.65, -0.05),
+    logR * 0.92
+  );
+  portadaGroup.add(diag2);
 
-  // Tela derecha: verde con franja azul
-  const telaDerMat = new THREE.MeshStandardMaterial({
-    color: ORION_COLORS.verde,
-    side: THREE.DoubleSide,
-    roughness: 0.85
-  });
-  const telaDer = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 1.6), telaDerMat);
-  telaDer.position.set(3.35, tripodH - 1.1, 0.05);
-  portadaGroup.add(telaDer);
+  // Amarre diagonal central donde se cruza la "X" (X = 0, Y = 2.95 m)
+  const crossKnot = new THREE.Mesh(new THREE.TorusGeometry(0.14, 0.05, 8, 16), ropeMat);
+  crossKnot.position.set(0, 2.95, 0);
+  crossKnot.rotation.y = Math.PI / 2;
+  portadaGroup.add(crossKnot);
 
-  // Franja azul en tela derecha
-  const franjaDerMat = new THREE.MeshStandardMaterial({
-    color: ORION_COLORS.azul,
-    side: THREE.DoubleSide,
-    roughness: 0.85
-  });
-  const franjaDer = new THREE.Mesh(new THREE.PlaneGeometry(0.15, 1.6), franjaDerMat);
-  franjaDer.position.set(2.95, tripodH - 1.1, 0.06);
-  portadaGroup.add(franjaDer);
-
-  // ── Letreros de madera pirograbada ────────────────────────────────────────
-  const signWoodMat = new THREE.MeshStandardMaterial({ color: 0x3b1f0a, roughness: 0.9 });
-
-  function createCarvedSign(text, width, height, bgColor = '#3b1f0a', textColor = '#f5c518') {
-    const sGroup = new THREE.Group();
-    const board = new THREE.Mesh(new THREE.BoxGeometry(width, height, 0.05), signWoodMat);
-    board.castShadow = true;
-    sGroup.add(board);
-
-    const canvas = document.createElement('canvas');
-    canvas.width = 512;
-    canvas.height = 128;
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = bgColor;
-    ctx.fillRect(0, 0, 512, 128);
-
-    // Borde decorativo en verde
-    ctx.strokeStyle = '#1a7a3f';
-    ctx.lineWidth = 6;
-    ctx.strokeRect(6, 6, 500, 116);
-
-    ctx.fillStyle = textColor;
-    ctx.font = 'bold 40px "Plus Jakarta Sans", sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(text, 256, 64);
-
-    const tex = new THREE.CanvasTexture(canvas);
-    const frontPlane = new THREE.Mesh(
-      new THREE.PlaneGeometry(width * 0.96, height * 0.88),
-      new THREE.MeshBasicMaterial({ map: tex })
-    );
-    frontPlane.position.z = 0.028;
-    sGroup.add(frontPlane);
-    return sGroup;
+  // Amarres de las diagonales al cruzarse con el travesaño horizontal
+  for (const kx of [-1.15, 1.15]) {
+    const kDiag = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.20, 8), ropeMat);
+    kDiag.rotation.z = Math.PI / 4 * (kx > 0 ? -1 : 1);
+    kDiag.position.set(kx, tripodH - 0.15, 0);
+    portadaGroup.add(kDiag);
   }
 
-  // Letrero "ENTRADA VARONES"
-  const signVarones = createCarvedSign('ENTRADA VARONES', 2.0, 0.38);
-  signVarones.position.set(-1.3, tripodH - 0.75, 0);
-  portadaGroup.add(signVarones);
+  // ── Telas decorativas laterales (colores institucionales Club Orión) ────────
+  // A. Espacios interiores entre trípodes y vano central
+  // Tela interior izquierda: Azul Orión con franja verde y orla dorada
+  const telaIntIzqMat = new THREE.MeshStandardMaterial({
+    color: ORION_COLORS.azul,
+    side: THREE.DoubleSide,
+    roughness: 0.85
+  });
+  const telaIntIzq = new THREE.Mesh(new THREE.PlaneGeometry(0.95, 1.60), telaIntIzqMat);
+  telaIntIzq.position.set(-1.85, tripodH - 1.05, 0.04);
+  portadaGroup.add(telaIntIzq);
 
-  // Letrero "ENTRADA MUJERES"
-  const signMujeres = createCarvedSign('ENTRADA MUJERES', 2.0, 0.38);
-  signMujeres.position.set(1.3, tripodH - 0.75, 0);
-  portadaGroup.add(signMujeres);
+  const franjaIntIzqMat = new THREE.MeshStandardMaterial({
+    color: ORION_COLORS.verde,
+    side: THREE.DoubleSide,
+    roughness: 0.85
+  });
+  const franjaIntIzq = new THREE.Mesh(new THREE.PlaneGeometry(0.20, 1.60), franjaIntIzqMat);
+  franjaIntIzq.position.set(-1.50, tripodH - 1.05, 0.05);
+  portadaGroup.add(franjaIntIzq);
+
+  // Tela interior derecha: Verde Orión con franja azul y orla dorada
+  const telaIntDerMat = new THREE.MeshStandardMaterial({
+    color: ORION_COLORS.verde,
+    side: THREE.DoubleSide,
+    roughness: 0.85
+  });
+  const telaIntDer = new THREE.Mesh(new THREE.PlaneGeometry(0.95, 1.60), telaIntDerMat);
+  telaIntDer.position.set(1.85, tripodH - 1.05, 0.04);
+  portadaGroup.add(telaIntDer);
+
+  const franjaIntDerMat = new THREE.MeshStandardMaterial({
+    color: ORION_COLORS.azul,
+    side: THREE.DoubleSide,
+    roughness: 0.85
+  });
+  const franjaIntDer = new THREE.Mesh(new THREE.PlaneGeometry(0.20, 1.60), franjaIntDerMat);
+  franjaIntDer.position.set(1.50, tripodH - 1.05, 0.05);
+  portadaGroup.add(franjaIntDer);
+
+  // B. Telas exteriores laterales (flanco exterior de los trípodes)
+  const telaExtIzq = new THREE.Mesh(new THREE.PlaneGeometry(0.85, 1.50), telaIntIzqMat);
+  telaExtIzq.position.set(-3.25, tripodH - 1.10, 0.04);
+  portadaGroup.add(telaExtIzq);
+
+  const telaExtDer = new THREE.Mesh(new THREE.PlaneGeometry(0.85, 1.50), telaIntDerMat);
+  telaExtDer.position.set(3.25, tripodH - 1.10, 0.04);
+  portadaGroup.add(telaExtDer);
 
   // ── Letrero principal "CLUB ORIÓN" con logo en canvas ─────────────────────
   function createClubOrionSign() {
@@ -338,7 +355,8 @@ export function createPortadaYCercado() {
   }
 
   const mainSign = createClubOrionSign();
-  mainSign.position.set(0, tripodH + 0.25, 0);
+  // Montado sobre la intersección de las diagonales cruzadas
+  mainSign.position.set(0, 3.25, 0.08);
   portadaGroup.add(mainSign);
 
   // ── Cotas 3D sobre la portada ─────────────────────────────────────────────
@@ -363,31 +381,31 @@ export function createPortadaYCercado() {
     return sp;
   }
 
-  // Cota de ANCHO (5.20 m)
+  // Cota de ANCHO (5.20 m entre trípodes)
   const cotaAnchoLine = new THREE.BufferGeometry().setFromPoints([
-    new THREE.Vector3(-2.6, tripodH + 0.55, 0),
-    new THREE.Vector3( 2.6, tripodH + 0.55, 0),
+    new THREE.Vector3(-2.6, 3.80, 0),
+    new THREE.Vector3( 2.6, 3.80, 0),
   ]);
   portadaGroup.add(new THREE.Line(cotaAnchoLine, cotaMat));
   // ticks
   for (const sx of [-2.6, 2.6]) {
     const t = new THREE.BufferGeometry().setFromPoints([
-      new THREE.Vector3(sx, tripodH + 0.45, 0),
-      new THREE.Vector3(sx, tripodH + 0.65, 0),
+      new THREE.Vector3(sx, 3.70, 0),
+      new THREE.Vector3(sx, 3.90, 0),
     ]);
     portadaGroup.add(new THREE.Line(t, cotaMat));
   }
   const labelAncho = makeLabel3D('↔ 5.20 m');
-  labelAncho.position.set(0, tripodH + 0.80, 0);
+  labelAncho.position.set(0, 4.05, 0);
   portadaGroup.add(labelAncho);
 
-  // Cota de ALTURA (3.00 m)
+  // Cota de ALTURA (3.00 m / 3.65 m cúspide)
   const cotaAltLine = new THREE.BufferGeometry().setFromPoints([
     new THREE.Vector3(3.3, 0, 0),
-    new THREE.Vector3(3.3, tripodH, 0),
+    new THREE.Vector3(3.3, 3.00, 0),
   ]);
   portadaGroup.add(new THREE.Line(cotaAltLine, cotaMat));
-  for (const sy of [0, tripodH]) {
+  for (const sy of [0, 3.00]) {
     const t = new THREE.BufferGeometry().setFromPoints([
       new THREE.Vector3(3.1, sy, 0),
       new THREE.Vector3(3.5, sy, 0),
@@ -395,23 +413,24 @@ export function createPortadaYCercado() {
     portadaGroup.add(new THREE.Line(t, cotaMat));
   }
   const labelAltura = makeLabel3D('↕ 3.00 m');
-  labelAltura.position.set(4.2, tripodH / 2, 0);
+  labelAltura.position.set(4.2, 1.50, 0);
   portadaGroup.add(labelAltura);
 
   // ── userData para el Inspector (clic en portada) ──────────────────────────
   portadaGroup.userData = {
     title: 'Portada Club Orión',
     category: 'Ingreso Principal',
-    desc: '3 trípodes pioneros con travesaño de 5.80 m. Altura máxima 3.00 m. Colores institucionales del Club Orión.',
+    desc: 'Estructura pionera de 2 trípodes laterales con 2 palos cruzados en X, viga travesaño de 5.80 m y mástiles integrados con Banderas de Perú y Club Orión.',
     specs: [
       { label: 'Ancho frontal',          val: PORTADA_SPECS.anchoPortada },
       { label: 'Altura máxima',          val: PORTADA_SPECS.alturaPortada },
-      { label: 'Palos trípode (c/u)',    val: `${PORTADA_SPECS.palosTripodesLargo} · ${PORTADA_SPECS.palosTripodesD}` },
-      { label: 'Palos trípode (total)',  val: `${PORTADA_SPECS.cantTripodesTotal} palos` },
-      { label: 'Travesaño',             val: `${PORTADA_SPECS.travesañoLargo} · ${PORTADA_SPECS.travesañoD}` },
+      { label: 'Palos trípodes (c/u)',   val: `${PORTADA_SPECS.palosTripodesLargo} · ${PORTADA_SPECS.palosTripodesD}` },
+      { label: 'Palos trípodes (total)', val: `${PORTADA_SPECS.cantTripodesTotal} palos (2 trípodes × 3)` },
+      { label: 'Palos cruzados en X',    val: `${PORTADA_SPECS.cantDiagonales} palos · ${PORTADA_SPECS.palosDiagonalesLargo} · ${PORTADA_SPECS.palosDiagonalesD}` },
+      { label: 'Mástiles en trípodes',   val: `${PORTADA_SPECS.cantMastiles} unids · ${PORTADA_SPECS.mastilesLargo} · ${PORTADA_SPECS.mastilesD}` },
+      { label: 'Travesaño horizontal',   val: `${PORTADA_SPECS.travesañoLargo} · ${PORTADA_SPECS.travesañoD}` },
       { label: 'Driza portada',          val: `${PORTADA_SPECS.drizaPortadaTotal} · ${PORTADA_SPECS.drizaPortadaD}` },
-      { label: 'Estacas cerco (c/u)',    val: `${PORTADA_SPECS.estacasLargo} · ${PORTADA_SPECS.estacasD}` },
-      { label: 'Estacas cerco (total)',  val: `${PORTADA_SPECS.cantEstacas} estacas` },
+      { label: 'Estacas cerco',          val: `${PORTADA_SPECS.cantEstacas} estacas · ${PORTADA_SPECS.estacasLargo}` },
       { label: 'Driza cerco',            val: `${PORTADA_SPECS.drizaCercoTotal} · ${PORTADA_SPECS.drizaCercoD}` },
     ]
   };
