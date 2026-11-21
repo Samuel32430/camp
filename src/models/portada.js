@@ -237,6 +237,8 @@ export function createPortadaYCercado() {
   portadaGroup.add(telaExtDer);
 
   // ── Letrero principal "CLUB ORIÓN" con logo en canvas ─────────────────────
+  const signWoodMat = new THREE.MeshStandardMaterial({ color: 0x3b1f0a, roughness: 0.9 });
+
   function createClubOrionSign() {
     const sGroup = new THREE.Group();
     const width = 3.0;
