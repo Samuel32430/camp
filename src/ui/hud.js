@@ -142,12 +142,16 @@ export function setupHUD({
   // ==========================================
   const btnFullscreen = document.getElementById('btn-fullscreen');
   function updateFullscreenBtn() {
-    if (document.fullscreenElement) {
-      if (btnFullscreen) btnFullscreen.textContent = '✕ Salir';
-      btnFullscreen?.classList.add('active');
-    } else {
-      if (btnFullscreen) btnFullscreen.textContent = '⛶ Pantalla Completa';
-      btnFullscreen?.classList.remove('active');
+    const isFs = !!document.fullscreenElement;
+    if (btnFullscreen) {
+      btnFullscreen.innerHTML = isFs
+        ? '<span class="fs-icon">✕</span><span class="fs-text"> Salir</span>'
+        : '<span class="fs-icon">⛶</span><span class="fs-text"> Pantalla Completa</span>';
+      if (isFs) {
+        btnFullscreen.classList.add('active');
+      } else {
+        btnFullscreen.classList.remove('active');
+      }
     }
   }
 
@@ -167,19 +171,25 @@ export function setupHUD({
   const sidebar = document.getElementById('hud-sidebar');
   const btnToggleSidebar = document.getElementById('btn-toggle-sidebar');
   const btnOpenSidebar = document.getElementById('btn-open-sidebar');
+  const sidebarBackdrop = document.getElementById('sidebar-backdrop');
 
   function toggleSidebar(show) {
     if (show) {
       sidebar?.classList.remove('collapsed');
       btnOpenSidebar?.classList.add('hidden');
+      if (window.innerWidth <= 768) {
+        sidebarBackdrop?.classList.remove('hidden');
+      }
     } else {
       sidebar?.classList.add('collapsed');
       btnOpenSidebar?.classList.remove('hidden');
+      sidebarBackdrop?.classList.add('hidden');
     }
   }
 
   btnToggleSidebar?.addEventListener('click', () => toggleSidebar(false));
   btnOpenSidebar?.addEventListener('click', () => toggleSidebar(true));
+  sidebarBackdrop?.addEventListener('click', () => toggleSidebar(false));
 
   // En celulares, iniciar con el menú oculto para no tapar la vista 3D
   if (window.innerWidth <= 768) {

@@ -55,6 +55,28 @@ body {
   z-index: 10;
 }
 
+/* Telón de fondo (Backdrop) para Drawer en móviles */
+.sidebar-backdrop {
+  display: none;
+}
+
+/* Visibilidad condicional según dispositivo */
+.desktop-only {
+  display: flex !important;
+}
+
+.touch-only {
+  display: none !important;
+}
+
+.title-full {
+  display: inline;
+}
+
+.title-mobile {
+  display: none;
+}
+
 /* Floating button to restore sidebar */
 .btn-open-sidebar {
   position: absolute;
@@ -637,89 +659,127 @@ body {
    ========================================================= */
 
 @media (max-width: 768px) {
-  /* Header compacto */
+  /* Fondo oscuro tipo backdrop para Drawer en móvil */
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    z-index: 85;
+    transition: opacity 0.25s ease;
+  }
+
+  .sidebar-backdrop.hidden {
+    display: none !important;
+  }
+
+  /* Visibilidad de controles táctiles en el footer */
+  .desktop-only {
+    display: none !important;
+  }
+
+  .touch-only {
+    display: flex !important;
+  }
+
+  /* Header compacto sin colisiones */
   .hud-header {
     top: 8px;
     left: 8px;
     right: 8px;
-    padding: 6px 12px;
-    min-height: 52px;
+    padding: 6px 10px;
+    min-height: 48px;
+    gap: 8px;
   }
 
   .logo-badge {
-    width: 38px;
-    height: 38px;
-  }
-
-  .header-title {
-    font-size: 0.88rem;
+    width: 36px;
+    height: 36px;
   }
 
   .header-badges {
     display: none; /* Ocultar badges secundarios en celular para no saturar */
   }
 
+  /* En celulares ocultar título largo y mostrar "Club Orión" */
+  .title-full {
+    display: none;
+  }
+
+  .title-mobile {
+    display: inline;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.01em;
+  }
+
+  .time-selector {
+    padding: 2px;
+    gap: 2px;
+  }
+
   .btn-time {
-    padding: 4px 8px;
+    padding: 4px 7px;
     font-size: 0.72rem;
   }
 
   .btn-fullscreen {
-    padding: 4px 8px;
-    font-size: 0.72rem;
+    padding: 5px 8px;
+    font-size: 0.76rem;
+    min-width: 32px;
+    justify-content: center;
   }
 
-  /* Sidebar flotante tipo drawer sobre celular */
+  /* Ocultar texto largo 'Pantalla Completa' en móvil y dejar icono ⛶ */
+  .fs-text {
+    display: none;
+  }
+
+  /* Sidebar flotante tipo drawer con mejor elevación y scroll */
   .hud-sidebar {
-    top: 68px;
+    top: 64px;
     left: 8px;
     right: 8px;
-    width: auto;
+    width: calc(100% - 16px);
     max-width: 320px;
-    max-height: calc(100vh - 120px);
+    max-height: calc(100vh - 84px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    z-index: 95;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.75);
+    border-radius: 12px;
   }
 
   .btn-open-sidebar {
-    top: 68px;
+    top: 64px;
     left: 8px;
     padding: 7px 12px;
     font-size: 0.76rem;
+    z-index: 90;
   }
 
   /* Inspector card tipo bottom sheet en celular */
   .inspector-card {
     left: 8px;
     right: 8px;
-    bottom: 42px;
+    bottom: 44px;
     width: auto;
+    z-index: 80;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.65);
   }
 
   /* Footer simplificado en pantalla táctil */
   .hud-footer {
     bottom: 6px;
     padding: 0 10px;
+    height: 28px;
     font-size: 0.68rem;
     gap: 8px;
-  }
-
-  .footer-hint:nth-child(n+3) {
-    display: none; /* Dejar solo los dos gestos táctiles esenciales */
-  }
-}
-
-@media (max-width: 480px) {
-  .header-title {
-    max-width: 150px;
-  }
-
-  .btn-time {
-    padding: 3px 6px;
-    font-size: 0.68rem;
-  }
-
-  .btn-fullscreen {
-    padding: 3px 6px;
-    font-size: 0.68rem;
+    z-index: 70;
   }
 }
 
@@ -1144,6 +1204,7 @@ body {
   font-family: var(--font-mono);
   font-weight: 700;
   color: #fbbf24;
+  white-space: nowrap;
 }
 
 /* Pestaña 2: Materiales Tabla */
@@ -1191,6 +1252,7 @@ body {
   font-family: var(--font-mono);
   font-weight: 600;
   color: #38bdf8;
+  white-space: nowrap;
 }
 
 .modal-table tr.row-highlight {
@@ -1289,17 +1351,103 @@ body {
 }
 
 @media (max-width: 640px) {
+  .info-modal {
+    padding: 16px 12px;
+    max-height: 88vh;
+    width: calc(100% - 16px);
+    border-radius: 14px;
+    gap: 12px;
+  }
+
+  .modal-header {
+    padding-bottom: 10px;
+  }
+
+  .modal-title {
+    font-size: 1.02rem;
+    padding-right: 36px; /* Evita choque con el botón de cierre */
+  }
+
+  .modal-subtitle {
+    font-size: 0.72rem;
+  }
+
+  .btn-modal-close {
+    width: 30px;
+    height: 30px;
+    font-size: 1.15rem;
+  }
+
+  /* Pestañas horizontales compactas (estilo Segmented Control / Tabs nativas) */
+  .modal-tabs {
+    flex-direction: row;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 4px;
+    padding: 3px;
+    border-radius: 8px;
+    scrollbar-width: none;
+  }
+
+  .modal-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .modal-tab-btn {
+    flex: 1 1 0;
+    padding: 7px 6px;
+    font-size: 0.71rem;
+    white-space: nowrap;
+    border-radius: 6px;
+  }
+
   .modal-planning-grid {
     grid-template-columns: 1fr;
+    gap: 10px;
   }
+
+  .planning-stat-card {
+    padding: 12px;
+    gap: 8px;
+  }
+
+  .stat-number {
+    font-size: 1.85rem;
+  }
+
+  .stat-timeline {
+    gap: 8px;
+  }
+
+  .timeline-row {
+    font-size: 0.76rem;
+    padding-bottom: 6px;
+  }
+
+  .modal-table th,
+  .modal-table td {
+    padding: 7px 8px;
+    font-size: 0.72rem;
+  }
+
   .classes-grid {
     grid-template-columns: 1fr;
+    gap: 8px;
   }
+
+  .class-card {
+    padding: 8px 10px;
+    gap: 4px;
+  }
+
   .areas-grid-modal {
     grid-template-columns: 1fr;
+    gap: 6px;
   }
-  .modal-tabs {
-    flex-direction: column;
+
+  .area-item-modal {
+    padding: 6px 8px;
+    font-size: 0.72rem;
   }
 }
 
