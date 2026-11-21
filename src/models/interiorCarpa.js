@@ -89,7 +89,8 @@ export function createInteriorCarpa() {
 
   const interiorLight = new THREE.PointLight(0xf59e0b, 1.8, 5.0);
   interiorLight.position.y = -0.04;
-  interiorLight.castShadow = true;
+  // Optimización: castShadow = false elimina 6 pases cubemap de sombra por frame
+  interiorLight.castShadow = false;
   lanternGroup.add(interiorLight);
 
   group.add(lanternGroup);

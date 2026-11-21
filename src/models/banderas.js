@@ -223,11 +223,17 @@ export function createBanderas() {
 }
 
 /**
- * Animación física de ondeo por viento
+ * Animación física de ondeo por viento optimizada:
+ * - Actualiza posiciones Z con ondas senoidales
+ * - Reduce el recálculo pesado de normales de CPU a cada 3 frames
  */
+let flagAnimFrame = 0;
 export function updateBanderas(timeSec) {
+  flagAnimFrame++;
+  const shouldComputeNormals = (flagAnimFrame % 3 === 0);
+
   for (let m = 0; m < flagMeshes.length; m++) {
-    const { mesh, dirX } = flagMeshes[m];
+    const { mesh } = flagMeshes[m];
     const pos = mesh.geometry.attributes.position;
     const cols = FLAG_SEGS_X + 1;
     const rows = FLAG_SEGS_Y + 1;
@@ -237,8 +243,6 @@ export function updateBanderas(timeSec) {
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
         const idx = r * cols + c;
-        // La bandera está anclada en el borde junto al mástil
-        // En PlaneGeometry centrado, el borde en c=0 o c=cols-1 según dirX
         const normX = c / FLAG_SEGS_X; // 0 a 1
 
         // Fijar el borde adyacente al mástil
@@ -253,7 +257,9 @@ export function updateBanderas(timeSec) {
       }
     }
     pos.needsUpdate = true;
-    mesh.geometry.computeVertexNormals();
+    if (shouldComputeNormals) {
+      mesh.geometry.computeVertexNormals();
+    }
   }
 }
 

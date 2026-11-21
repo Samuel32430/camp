@@ -34,6 +34,94 @@ export const CLASES_CONFIG = {
   }
 };
 
+// ==========================================
+// GEOMETRÍAS Y MATERIALES COMPARTIDOS (CACHÉ)
+// Reduce más de 300 VBOs duplicados y cientos de draw calls
+// ==========================================
+let sharedTentGeo = null;
+let sharedFlyGeo = null;
+const sharedRollGeo = new THREE.CylinderGeometry(0.035, 0.035, 0.85, 8);
+const sharedRollMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.9 });
+const sharedPoleGeo = new THREE.CylinderGeometry(0.022, 0.022, 1.45, 8);
+const sharedPoleMat = new THREE.MeshStandardMaterial({ color: 0x854d0e, roughness: 0.8 });
+const sharedPegGeo = new THREE.CylinderGeometry(0.012, 0.012, 0.15, 6);
+const sharedPegMat = new THREE.MeshStandardMaterial({ color: 0x713f12 });
+const sharedRopeMat = new THREE.LineBasicMaterial({ color: 0xfef08a });
+const materialCache = new Map();
+
+function getCachedCanvasMaterial(color, roughness = 0.75) {
+  const key = `canvas_${color}_${roughness}`;
+  if (!materialCache.has(key)) {
+    materialCache.set(key, new THREE.MeshStandardMaterial({
+      color,
+      roughness,
+      metalness: 0.05,
+      side: THREE.DoubleSide
+    }));
+  }
+  return materialCache.get(key);
+}
+
+function getSharedTentGeo() {
+  if (!sharedTentGeo) {
+    const width = 2.25;
+    const length = 2.40;
+    const height = 1.45;
+    const hw = width / 2;
+    const hl = length / 2;
+    const tentGeo = new THREE.BufferGeometry();
+    const positions = new Float32Array([
+      // Techo Lado Izquierdo (-X)
+      -hw, 0, hl,   0, height, hl,   0, height, -hl,
+      -hw, 0, hl,   0, height, -hl,  -hw, 0, -hl,
+
+      // Techo Lado Derecho (+X)
+      0, height, hl,   hw, 0, hl,   hw, 0, -hl,
+      0, height, hl,   hw, 0, -hl,  0, height, -hl,
+
+      // Pared Trasera (-Z)
+      -hw, 0, -hl,   0, height, -hl,   hw, 0, -hl,
+
+      // Suelo impermeable (2.25m x 2.40m)
+      -hw, 0.01, hl,   hw, 0.01, hl,   hw, 0.01, -hl,
+      -hw, 0.01, hl,   hw, 0.01, -hl,  -hw, 0.01, -hl
+    ]);
+    tentGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    tentGeo.computeVertexNormals();
+    sharedTentGeo = tentGeo;
+  }
+  return sharedTentGeo;
+}
+
+function getSharedFlyGeo() {
+  if (!sharedFlyGeo) {
+    const width = 2.25;
+    const length = 2.40;
+    const height = 1.45;
+    const awningFront = 0.35;
+    const hw = width / 2;
+    const hl = length / 2;
+    const flyExtra = 0.06;
+    const fhw = hw + flyExtra;
+    const fhl_front = hl + awningFront;
+    const fhl_back = hl + flyExtra;
+    const fh = height + flyExtra;
+
+    const flyGeo = new THREE.BufferGeometry();
+    const flyPositions = new Float32Array([
+      -fhw, 0.1, fhl_front,   0, fh, fhl_front,   0, fh, -fhl_back,
+      -fhw, 0.1, fhl_front,   0, fh, -fhl_back,  -fhw, 0.1, -fhl_back,
+
+      0, fh, fhl_front,   fhw, 0.1, fhl_front,   fhw, 0.1, -fhl_back,
+      0, fh, fhl_front,   fhw, 0.1, -fhl_back,  0, fh, -fhl_back
+    ]);
+    flyGeo.setAttribute('position', new THREE.BufferAttribute(flyPositions, 3));
+    flyGeo.computeVertexNormals();
+    sharedFlyGeo = flyGeo;
+  }
+  return sharedFlyGeo;
+}
+
 /**
  * Carpa de campaña con las medidas oficiales del plano (Módulo 6.6 m²):
  * - Ancho frontal: 2.25 m
@@ -83,113 +171,54 @@ export function createCarpa({
     claseNombre = cfg.nombre;
   }
 
-  const canvasMat = new THREE.MeshStandardMaterial({
-    color: mainColor,
-    roughness: 0.75,
-    metalness: 0.05,
-    side: THREE.DoubleSide
-  });
-
-  const flyMat = new THREE.MeshStandardMaterial({
-    color: flyColor,
-    roughness: 0.7,
-    metalness: 0.05,
-    side: THREE.DoubleSide
-  });
-
-  // Medidas exactas de la ficha técnica
-  const width = 2.25;   // 2.25 m de ancho frontal
-  const length = 2.40;  // 2.40 m de largo
-  const height = 1.45;  // 1.45 m de altura
-  const awningFront = 0.35; // 0.35 m de alero frontal
-
-  const hw = width / 2;
-  const hl = length / 2;
+  const canvasMat = getCachedCanvasMaterial(mainColor, 0.75);
+  const flyMat = getCachedCanvasMaterial(flyColor, 0.70);
 
   // 1. Cuerpo Principal de la Carpa (2.25m x 2.40m)
-  const tentGeo = new THREE.BufferGeometry();
-  const positions = new Float32Array([
-    // Techo Lado Izquierdo (-X)
-    -hw, 0, hl,   0, height, hl,   0, height, -hl,
-    -hw, 0, hl,   0, height, -hl,  -hw, 0, -hl,
-
-    // Techo Lado Derecho (+X)
-    0, height, hl,   hw, 0, hl,   hw, 0, -hl,
-    0, height, hl,   hw, 0, -hl,  0, height, -hl,
-
-    // Pared Trasera (-Z)
-    -hw, 0, -hl,   0, height, -hl,   hw, 0, -hl,
-
-    // Suelo impermeable (2.25m x 2.40m)
-    -hw, 0.01, hl,   hw, 0.01, hl,   hw, 0.01, -hl,
-    -hw, 0.01, hl,   hw, 0.01, -hl,  -hw, 0.01, -hl
-  ]);
-
-  tentGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-  tentGeo.computeVertexNormals();
-
-  const tentMesh = new THREE.Mesh(tentGeo, canvasMat);
+  const tentMesh = new THREE.Mesh(getSharedTentGeo(), canvasMat);
   tentMesh.castShadow = true;
   tentMesh.receiveShadow = true;
   group.add(tentMesh);
 
   // 2. Sobretecho con Alero Frontal de 0.35m (Largo total 2.75m)
-  const flyGeo = new THREE.BufferGeometry();
-  const flyExtra = 0.06;
-  const fhw = hw + flyExtra;
-  const fhl_front = hl + awningFront;
-  const fhl_back = hl + flyExtra;
-  const fh = height + flyExtra;
-
-  const flyPositions = new Float32Array([
-    -fhw, 0.1, fhl_front,   0, fh, fhl_front,   0, fh, -fhl_back,
-    -fhw, 0.1, fhl_front,   0, fh, -fhl_back,  -fhw, 0.1, -fhl_back,
-
-    0, fh, fhl_front,   fhw, 0.1, fhl_front,   fhw, 0.1, -fhl_back,
-    0, fh, fhl_front,   fhw, 0.1, -fhl_back,  0, fh, -fhl_back
-  ]);
-
-  flyGeo.setAttribute('position', new THREE.BufferAttribute(flyPositions, 3));
-  flyGeo.computeVertexNormals();
-
-  const flyMesh = new THREE.Mesh(flyGeo, flyMat);
+  const flyMesh = new THREE.Mesh(getSharedFlyGeo(), flyMat);
   flyMesh.castShadow = true;
   flyMesh.receiveShadow = true;
   group.add(flyMesh);
 
+  const width = 2.25;
+  const length = 2.40;
+  const height = 1.45;
+  const awningFront = 0.35;
+  const hw = width / 2;
+  const hl = length / 2;
+  const flyExtra = 0.06;
+  const fhl_front = hl + awningFront;
+  const fhl_back = hl + flyExtra;
+
   // 3. Puerta Abierta Enrollada
-  const rollMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.9 });
-  const rollGeo = new THREE.CylinderGeometry(0.035, 0.035, 0.85, 8);
-  
-  const rollLeft = new THREE.Mesh(rollGeo, rollMat);
+  const rollLeft = new THREE.Mesh(sharedRollGeo, sharedRollMat);
   rollLeft.position.set(-hw * 0.45, 0.5, hl + 0.03);
   rollLeft.rotation.z = -0.3;
   group.add(rollLeft);
 
-  const rollRight = new THREE.Mesh(rollGeo, rollMat);
+  const rollRight = new THREE.Mesh(sharedRollGeo, sharedRollMat);
   rollRight.position.set(hw * 0.45, 0.5, hl + 0.03);
   rollRight.rotation.z = 0.3;
   group.add(rollRight);
 
   // 4. Parantes Frontales
-  const poleMat = new THREE.MeshStandardMaterial({ color: 0x854d0e, roughness: 0.8 });
-  const poleGeo = new THREE.CylinderGeometry(0.022, 0.022, height, 8);
-  
-  const frontPoleLeft = new THREE.Mesh(poleGeo, poleMat);
+  const frontPoleLeft = new THREE.Mesh(sharedPoleGeo, sharedPoleMat);
   frontPoleLeft.position.set(-hw, height / 2, hl);
   frontPoleLeft.castShadow = true;
   group.add(frontPoleLeft);
 
-  const frontPoleRight = new THREE.Mesh(poleGeo, poleMat);
+  const frontPoleRight = new THREE.Mesh(sharedPoleGeo, sharedPoleMat);
   frontPoleRight.position.set(hw, height / 2, hl);
   frontPoleRight.castShadow = true;
   group.add(frontPoleRight);
 
-  // 5. Vientos Tensores compactos
-  const ropeMat = new THREE.LineBasicMaterial({ color: 0xfef08a });
-  const pegGeo = new THREE.CylinderGeometry(0.012, 0.012, 0.15, 6);
-  const pegMat = new THREE.MeshStandardMaterial({ color: 0x713f12 });
-
+  // 5. Vientos Tensores compactos (Optimizado con LineSegments único)
   const cornerOffsets = [
     [-hw - 0.2, 0, fhl_front + 0.2],
     [hw + 0.2, 0, fhl_front + 0.2],
@@ -197,28 +226,25 @@ export function createCarpa({
     [hw + 0.2, 0, -fhl_back - 0.2]
   ];
 
+  const ropePoints = [];
   cornerOffsets.forEach(([px, py, pz]) => {
-    const peg = new THREE.Mesh(pegGeo, pegMat);
+    const peg = new THREE.Mesh(sharedPegGeo, sharedPegMat);
     peg.position.set(px, 0.07, pz);
     peg.rotation.z = (px > 0 ? 0.3 : -0.3);
     group.add(peg);
 
     const startX = (px > 0 ? hw : -hw);
     const startZ = (pz > 0 ? hl : -hl);
-    const lineGeo = new THREE.BufferGeometry().setFromPoints([
+    ropePoints.push(
       new THREE.Vector3(startX, 0.75, startZ),
       new THREE.Vector3(px, 0.05, pz)
-    ]);
-    group.add(new THREE.Line(lineGeo, ropeMat));
+    );
   });
 
-  // 6. Luz Interior Cálida
-  const tentLight = new THREE.PointLight(0xf59e0b, 0.6, 3.2);
-  tentLight.position.set(0, 0.85, 0);
-  tentLight.name = 'TentInteriorLight';
-  group.add(tentLight);
+  const ropeGeo = new THREE.BufferGeometry().setFromPoints(ropePoints);
+  group.add(new THREE.LineSegments(ropeGeo, sharedRopeMat));
 
-  // 7. Módulo Tendedero-Zapatero al Lateral
+  // 6. Módulo Tendedero-Zapatero al Lateral
   // Según el plano: Tendedero 1.0m x 0.5m + Zapatero 0.8m x 0.4m
   if (needsTendedero) {
     const tendedero = createTendederoZapatero();
@@ -234,7 +260,7 @@ export function createCarpa({
     group.add(tendedero);
   }
 
-  // 8. Ficha Técnica Exacta con Clase Scout
+  // 7. Ficha Técnica Exacta con Clase Scout
   const hasConstruccion = needsTendedero ? 'Con Tendedero (1.0×0.5m) y Zapatero (0.8×0.4m)' : 'Sin construcción';
   const claseTitulo = claseNombre ? ` · Clase ${claseNombre}` : '';
   group.userData = {

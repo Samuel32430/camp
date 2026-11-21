@@ -9,23 +9,25 @@ export function createLights(scene) {
   hemiLight.position.set(0, 30, 0);
   lightsGroup.add(hemiLight);
 
-  // 2. Luz Solar Direccional Principal (con sombras suaves)
+  // 2. Luz Solar Direccional Principal (con sombras suaves optimizadas)
   const dirLight = new THREE.DirectionalLight(0xfff5e6, 1.4);
   dirLight.position.set(18, 28, 16);
   dirLight.castShadow = true;
-  dirLight.shadow.mapSize.width = 2048;
-  dirLight.shadow.mapSize.height = 2048;
+  // Optimización: 1024x1024 reduce el uso de memoria en un 75% y acelera drásticamente el renderizado
+  dirLight.shadow.mapSize.width = 1024;
+  dirLight.shadow.mapSize.height = 1024;
   dirLight.shadow.camera.near = 0.5;
-  dirLight.shadow.camera.far = 80;
+  dirLight.shadow.camera.far = 70;
   
-  // Límites ortográficos de la sombra para cubrir el terreno ampliado de 24x20m
-  const d = 18;
+  // Límites ortográficos ajustados al lote de 20x18m (alta densidad de píxeles en sombras)
+  const d = 15;
   dirLight.shadow.camera.left = -d;
   dirLight.shadow.camera.right = d;
   dirLight.shadow.camera.top = d;
   dirLight.shadow.camera.bottom = -d;
   dirLight.shadow.bias = -0.0005;
-  dirLight.shadow.radius = 2.5; // Sombra difusa natural
+  dirLight.shadow.normalBias = 0.02; // Evita el shadow acne y líneas oscuras en geometría
+  dirLight.shadow.radius = 2.0; // Sombra difusa natural
   lightsGroup.add(dirLight);
 
   // 3. Luz de Relleno Secundaria (Ambiental suave)

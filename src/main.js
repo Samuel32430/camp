@@ -30,14 +30,30 @@ const camera = new THREE.PerspectiveCamera(
 );
 camera.position.set(20, 18, 20);
 
-const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+const renderer = new THREE.WebGLRenderer({
+  antialias: true,
+  alpha: false,
+  powerPreference: 'high-performance',
+  stencil: false,
+  depth: true
+});
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+function getOptimalPixelRatio() {
+  // Limitar DPR a 1.25 en móvil y 1.5 en desktop para evitar saturar el fill rate
+  const isMobile = window.innerWidth <= 768;
+  return Math.min(window.devicePixelRatio || 1, isMobile ? 1.25 : 1.5);
+}
+
+renderer.setPixelRatio(getOptimalPixelRatio());
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.05;
 container.appendChild(renderer.domElement);
+
+// Diagnóstico de métricas en consola para verificar rendimiento
+window.__campRenderer = renderer;
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
@@ -302,6 +318,7 @@ window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(getOptimalPixelRatio());
 });
 
 // ==========================================
