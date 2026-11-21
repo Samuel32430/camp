@@ -1,6 +1,39 @@
 import * as THREE from 'three';
 import { createTendederoZapatero } from './tendederoZapatero.js';
 
+export const CLASES_CONFIG = {
+  compañero: {
+    nombre: 'Compañero',
+    colorHex: '#dc2626',
+    mainColor: 0xdc2626, // Rojo oficial
+    flyColor: 0xef4444,
+  },
+  explorador: {
+    nombre: 'Explorador',
+    colorHex: '#16a34a',
+    mainColor: 0x15803d, // Verde oficial
+    flyColor: 0x22c55e,
+  },
+  pionero: {
+    nombre: 'Pionero',
+    colorHex: '#94a3b8',
+    mainColor: 0x64748b, // Plata / Gris metálico oficial
+    flyColor: 0x94a3b8,
+  },
+  excursionista: {
+    nombre: 'Excursionista',
+    colorHex: '#9333ea',
+    mainColor: 0x7e22ce, // Morado oficial
+    flyColor: 0xa855f7,
+  },
+  guia: {
+    nombre: 'Guía',
+    colorHex: '#eab308',
+    mainColor: 0xca8a04, // Amarillo oficial
+    flyColor: 0xeab308,
+  }
+};
+
 /**
  * Carpa de campaña con las medidas oficiales del plano (Módulo 6.6 m²):
  * - Ancho frontal: 2.25 m
@@ -13,12 +46,13 @@ import { createTendederoZapatero } from './tendederoZapatero.js';
 export function createCarpa({
   id = 1,
   type = 'varones',
+  clase = null,
   position = [0, 0, 0],
   rotationY = 0,
   includeTendedero = true
 } = {}) {
   const group = new THREE.Group();
-  group.name = `Carpa_${type}_${id}`;
+  group.name = `Carpa_${type}_${clase || 'base'}_${id}`;
   group.position.set(...position);
   group.rotation.y = rotationY;
 
@@ -26,17 +60,27 @@ export function createCarpa({
 
   let mainColor, flyColor, sectorName;
   if (type === 'varones') {
-    mainColor = 0x1e40af; // Azul scout varones
+    mainColor = 0x1e40af; // Azul scout varones base
     flyColor = 0x3b82f6;
     sectorName = 'Sector Varones';
   } else if (type === 'mujeres') {
-    mainColor = 0xbe185d; // Frambuesa scout mujeres
+    mainColor = 0xbe185d; // Frambuesa scout mujeres base
     flyColor = 0xec4899;
     sectorName = 'Sector Mujeres';
   } else {
     mainColor = 0x3f6212; // Verde oliva directiva
     flyColor = 0x65a30d;
     sectorName = 'Directiva y Jefatura';
+  }
+
+  // Aplicar color de la Clase Scout si está designada
+  let claseNombre = null;
+  const claseKey = clase ? clase.toLowerCase().trim() : null;
+  if (claseKey && CLASES_CONFIG[claseKey]) {
+    const cfg = CLASES_CONFIG[claseKey];
+    mainColor = cfg.mainColor;
+    flyColor = cfg.flyColor;
+    claseNombre = cfg.nombre;
   }
 
   const canvasMat = new THREE.MeshStandardMaterial({
@@ -190,12 +234,14 @@ export function createCarpa({
     group.add(tendedero);
   }
 
-  // 8. Ficha Técnica Exacta
+  // 8. Ficha Técnica Exacta con Clase Scout
   const hasConstruccion = needsTendedero ? 'Con Tendedero (1.0×0.5m) y Zapatero (0.8×0.4m)' : 'Sin construcción';
+  const claseTitulo = claseNombre ? ` · Clase ${claseNombre}` : '';
   group.userData = {
-    title: `Carpa #${id} (${sectorName})`,
-    category: sectorName,
+    title: `Carpa #${id} (${sectorName}${claseTitulo})`,
+    category: `${sectorName}${claseTitulo}`,
     specs: [
+      ...(claseNombre ? [{ label: 'Clase Scout', val: claseNombre }] : []),
       { label: 'Cuerpo Carpa', val: '2.25 m × 2.40 m' },
       { label: 'Alero Frontal', val: '0.35 m' },
       { label: 'Largo Total Módulo', val: '2.75 m' },

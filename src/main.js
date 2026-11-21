@@ -84,91 +84,102 @@ const { banderasGroup, updateBanderas } = createBanderas();
 scene.add(banderasGroup);
 
 // =========================================================
-// 3. DISTRIBUCIÓN MATEMÁTICA EXACTA DE LAS 25 CARPAS
-//    (10 Varones + 10 Mujeres + 5 Directiva)
+// 3. DISTRIBUCIÓN MATEMÁTICA DE LAS 25 CARPAS
+//    (10 Varones + 10 Mujeres asignadas por Clases de adelante hacia atrás + 5 Directiva)
 // =========================================================
 const carpasGroup = new THREE.Group();
 carpasGroup.name = 'CarpasGroup';
 
 // ---------------------------------------------------------
-// A. FILA DEL FONDO: 8 CARPAS (4 Varones + 4 Mujeres)
-// Z = -7.6m, mirando hacia el patio frontal (+Z)
-// Pasadizo horizontal de 1.5m libre delante de ellas
+// A. SECTOR VARONES (10 CARPAS): Orden de adelante (+Z) hacia atrás (-Z)
+//    - Compañero (Rojo): 2 carpas
+//    - Explorador (Verde): 1 carpa
+//    - Pionero (Plata): 1 carpa
+//    - Excursionista (Morado): 3 carpas
+//    - Guía (Amarillo): 1 carpa
+//    - Reserva / Sobrantes: 2 carpas (mantienen azul scout base)
 // ---------------------------------------------------------
-// 4 Carpas Fondo Varones (X = -8.75, -6.25, -3.75, -1.25)
-const xFondoVarones = [-8.75, -6.25, -3.75, -1.25];
-xFondoVarones.forEach((x, idx) => {
+const varonesDistribucion = [
+  // 1 y 2: Frente exterior (+Z = 3.6 y 1.2) -> Compañero (Rojo)
+  { id: 1, clase: 'compañero', pos: [-8.75, 0,  3.6], rot: Math.PI / 2 },
+  { id: 2, clase: 'compañero', pos: [-8.75, 0,  1.2], rot: Math.PI / 2 },
+
+  // 3: Columna exterior medio (+Z = -1.2) -> Explorador (Verde)
+  { id: 3, clase: 'explorador', pos: [-8.75, 0, -1.2], rot: Math.PI / 2 },
+
+  // 4: Columna interior medio (+Z = -1.2) -> Pionero (Plata)
+  { id: 4, clase: 'pionero', pos: [-5.00, 0, -1.2], rot: Math.PI / 2 },
+
+  // 5 y 6: Columna exterior e interior atrás (+Z = -3.6) -> Excursionista (Morado)
+  { id: 5, clase: 'excursionista', pos: [-8.75, 0, -3.6], rot: Math.PI / 2 },
+  { id: 6, clase: 'excursionista', pos: [-5.00, 0, -3.6], rot: Math.PI / 2 },
+
+  // 7: Fila fondo más cercana al patio central (X = -1.25, Z = -7.6) -> Excursionista (Morado)
+  { id: 7, clase: 'excursionista', pos: [-1.25, 0, -7.6], rot: 0 },
+
+  // 8: Fila fondo (X = -3.75, Z = -7.6) -> Guía (Amarillo)
+  { id: 8, clase: 'guia', pos: [-3.75, 0, -7.6], rot: 0 },
+
+  // 9 y 10: Fila fondo restante (X = -6.25 y -8.75, Z = -7.6) -> Reserva / Sin Asignar (Azul base)
+  { id: 9, clase: null, pos: [-6.25, 0, -7.6], rot: 0 },
+  { id: 10, clase: null, pos: [-8.75, 0, -7.6], rot: 0 },
+];
+
+varonesDistribucion.forEach(cfg => {
   const carpa = createCarpa({
-    id: idx + 7,
+    id: cfg.id,
     type: 'varones',
-    position: [x, 0, -7.6],
-    rotationY: 0
+    clase: cfg.clase,
+    position: cfg.pos,
+    rotationY: cfg.rot
   });
   carpasGroup.add(carpa);
 });
 
-// 4 Carpas Fondo Mujeres (X = +1.25, +3.75, +6.25, +8.75)
-const xFondoMujeres = [1.25, 3.75, 6.25, 8.75];
-xFondoMujeres.forEach((x, idx) => {
+// ---------------------------------------------------------
+// B. SECTOR MUJERES (10 CARPAS): Orden de adelante (+Z) hacia atrás (-Z)
+//    - Compañero (Rojo): 1 carpa
+//    - Explorador (Verde): 2 carpas
+//    - Pionero (Plata): 2 carpas
+//    - Excursionista (Morado): 3 carpas
+//    - Guía (Amarillo): 1 carpa
+//    - Reserva / Sobrante: 1 carpa (mantiene frambuesa base)
+// ---------------------------------------------------------
+const mujeresDistribucion = [
+  // 1: Frente exterior (+Z = 3.6) -> Compañero (Rojo)
+  { id: 1, clase: 'compañero', pos: [8.75, 0,  3.6], rot: -Math.PI / 2 },
+
+  // 2 y 3: Frente exterior (+Z = 1.2 y -1.2) -> Explorador (Verde)
+  { id: 2, clase: 'explorador', pos: [8.75, 0,  1.2], rot: -Math.PI / 2 },
+  { id: 3, clase: 'explorador', pos: [8.75, 0, -1.2], rot: -Math.PI / 2 },
+
+  // 4: Columna interior medio (+Z = -1.2) -> Pionero (Plata)
+  { id: 4, clase: 'pionero', pos: [5.00, 0, -1.2], rot: -Math.PI / 2 },
+
+  // 5: Columna exterior atrás (+Z = -3.6) -> Pionero (Plata)
+  { id: 5, clase: 'pionero', pos: [8.75, 0, -3.6], rot: -Math.PI / 2 },
+
+  // 6: Columna interior atrás (+Z = -3.6) -> Excursionista (Morado)
+  { id: 6, clase: 'excursionista', pos: [5.00, 0, -3.6], rot: -Math.PI / 2 },
+
+  // 7 y 8: Fila fondo más cercana al patio central (X = +1.25 y +3.75, Z = -7.6) -> Excursionista (Morado)
+  { id: 7, clase: 'excursionista', pos: [1.25, 0, -7.6], rot: 0 },
+  { id: 8, clase: 'excursionista', pos: [3.75, 0, -7.6], rot: 0 },
+
+  // 9: Fila fondo (X = +6.25, Z = -7.6) -> Guía (Amarillo)
+  { id: 9, clase: 'guia', pos: [6.25, 0, -7.6], rot: 0 },
+
+  // 10: Fila fondo restante (X = +8.75, Z = -7.6) -> Reserva / Sin Asignar (Frambuesa base)
+  { id: 10, clase: null, pos: [8.75, 0, -7.6], rot: 0 },
+];
+
+mujeresDistribucion.forEach(cfg => {
   const carpa = createCarpa({
-    id: idx + 7,
+    id: cfg.id,
     type: 'mujeres',
-    position: [x, 0, -7.6],
-    rotationY: 0
-  });
-  carpasGroup.add(carpa);
-});
-
-// ---------------------------------------------------------
-// B. ALA VARONES: 6 CARPAS EN COSTADO (Completando 10)
-// Mirando hacia el centro (+X) con tendedero a su izquierda
-// ---------------------------------------------------------
-// 4 Carpas en Columna Exterior (X = -8.75)
-const zCostadoRows = [3.6, 1.2, -1.2, -3.6];
-zCostadoRows.forEach((z, idx) => {
-  const carpa = createCarpa({
-    id: idx + 1,
-    type: 'varones',
-    position: [-8.75, 0, z],
-    rotationY: Math.PI / 2
-  });
-  carpasGroup.add(carpa);
-});
-
-// 2 Carpas en Columna Interior (X = -5.0, Z = -1.2 y -3.6 al frente del fondo)
-const zInnerCostado = [-1.2, -3.6];
-zInnerCostado.forEach((z, idx) => {
-  const carpa = createCarpa({
-    id: idx + 5,
-    type: 'varones',
-    position: [-5.0, 0, z],
-    rotationY: Math.PI / 2
-  });
-  carpasGroup.add(carpa);
-});
-
-// ---------------------------------------------------------
-// C. ALA MUJERES: 6 CARPAS EN COSTADO (Completando 10)
-// Mirando hacia el centro (-X) con tendedero a su derecha
-// ---------------------------------------------------------
-// 4 Carpas en Columna Exterior (X = +8.75)
-zCostadoRows.forEach((z, idx) => {
-  const carpa = createCarpa({
-    id: idx + 1,
-    type: 'mujeres',
-    position: [8.75, 0, z],
-    rotationY: -Math.PI / 2
-  });
-  carpasGroup.add(carpa);
-});
-
-// 2 Carpas en Columna Interior (X = +5.0, Z = -1.2 y -3.6 al frente del fondo)
-zInnerCostado.forEach((z, idx) => {
-  const carpa = createCarpa({
-    id: idx + 5,
-    type: 'mujeres',
-    position: [5.0, 0, z],
-    rotationY: -Math.PI / 2
+    clase: cfg.clase,
+    position: cfg.pos,
+    rotationY: cfg.rot
   });
   carpasGroup.add(carpa);
 });
