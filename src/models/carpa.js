@@ -241,13 +241,13 @@ export function createCarpa({
     title: `Carpa #${id} (${sectorName}${claseTitulo})`,
     category: `${sectorName}${claseTitulo}`,
     specs: [
-      ...(claseNombre ? [{ label: 'Clase Scout', val: claseNombre }] : []),
-      { label: 'Cuerpo Carpa', val: '2.25 m × 2.40 m' },
-      { label: 'Alero Frontal', val: '0.35 m' },
+      ...(claseNombre ? [{ label: 'Clase', val: claseNombre }] : []),
+      { label: 'Carpa', val: '2.25 m × 2.40 m' },
+      { label: 'Frontal', val: '0.35 m' },
       { label: 'Largo Total Módulo', val: '2.75 m' },
       { label: 'Área Total Módulo', val: '6.60 m² (2.40m × 2.75m)' },
       { label: 'Capacidad', val: '5 - 6 participantes' },
-      { label: 'Equipamiento', val: hasConstruccion }
+      { label: 'Construccion', val: hasConstruccion }
     ]
   };
 

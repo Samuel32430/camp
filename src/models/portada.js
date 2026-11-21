@@ -19,37 +19,37 @@ export const ORION_COLORS = {
 // ── Especificaciones técnicas (editables para la presentación) ───────────────
 export const PORTADA_SPECS = {
   // Trípodes principales
-  palosTripodesLargo:   '3.60 m',
-  palosTripodesD:       'Ø 10–12 cm',
+  palosTripodesLargo:   '3.50 m',
+  palosTripodesD:       '10–12 cm',
   cantTripodesTotal:    6,            // 2 trípodes laterales × 3 palos
 
   // Palos diagonales cruzados en "X"
-  palosDiagonalesLargo: '4.80 m',
-  palosDiagonalesD:     'Ø 10–12 cm',
+  palosDiagonalesLargo: '3.00 m',
+  palosDiagonalesD:     '10–12 cm',
   cantDiagonales:       2,
 
   // Mástiles integrados para banderas
-  mastilesLargo:        '4.30 m',
-  mastilesD:            'Ø 5–6 cm',
+  mastilesLargo:        '3.50 m',
+  mastilesD:            '8–10 cm',
   cantMastiles:         2,
 
   // Travesaño superior
-  travesañoLargo:       '5.80 m',
-  travesañoD:           'Ø 10–12 cm',
+  travesañoLargo:       '6.00 m',
+  travesañoD:           '10–12 cm',
   cantTravesaño:        1,
 
   // Cerco frontal (estacas)
   estacasLargo:         '1.20 m',
-  estacasD:             'Ø 3–4 cm',
+  estacasD:             '3–4 cm',
   cantEstacas:          12,
 
   // Driza portada (amarres de trípodes, diagonales y travesaño)
-  drizaPortadaTotal:    '≈ 30 m',
-  drizaPortadaD:        'Ø 6–8 mm',
+  drizaPortadaTotal:    '25 m',
+  drizaPortadaD:        '6–8 mm',
 
   // Driza cerco (3 niveles × 2 tramos)
-  drizaCercoTotal:      '≈ 50 m',
-  drizaCercoD:          'Ø 4–6 mm',
+  drizaCercoTotal:      '≈ 30 m',
+  drizaCercoD:          '4–6 mm',
 
   // Medidas generales
   anchoPortada:         '5.20 m',
@@ -386,11 +386,11 @@ export function createPortadaYCercado() {
     specs: [
       { label: 'Ancho frontal',          val: PORTADA_SPECS.anchoPortada },
       { label: 'Altura máxima',          val: PORTADA_SPECS.alturaPortada },
-      { label: 'Palos trípodes (c/u)',   val: `${PORTADA_SPECS.palosTripodesLargo} · ${PORTADA_SPECS.palosTripodesD}` },
+      { label: 'Palos trípode s (c/u)',   val: `${PORTADA_SPECS.palosTripodesLargo} · ${PORTADA_SPECS.palosTripodesD}` },
       { label: 'Palos trípodes (total)', val: `${PORTADA_SPECS.cantTripodesTotal} palos (2 trípodes × 3)` },
       { label: 'Palos cruzados en X',    val: `${PORTADA_SPECS.cantDiagonales} palos · ${PORTADA_SPECS.palosDiagonalesLargo} · ${PORTADA_SPECS.palosDiagonalesD}` },
       { label: 'Mástiles en trípodes',   val: `${PORTADA_SPECS.cantMastiles} unids · ${PORTADA_SPECS.mastilesLargo} · ${PORTADA_SPECS.mastilesD}` },
-      { label: 'Travesaño horizontal',   val: `${PORTADA_SPECS.travesañoLargo} · ${PORTADA_SPECS.travesañoD}` },
+      { label: 'Palo largo horizontal',   val: `${PORTADA_SPECS.travesañoLargo} · ${PORTADA_SPECS.travesañoD}` },
       { label: 'Driza portada',          val: `${PORTADA_SPECS.drizaPortadaTotal} · ${PORTADA_SPECS.drizaPortadaD}` },
       { label: 'Estacas cerco',          val: `${PORTADA_SPECS.cantEstacas} estacas · ${PORTADA_SPECS.estacasLargo}` },
       { label: 'Driza cerco',            val: `${PORTADA_SPECS.drizaCercoTotal} · ${PORTADA_SPECS.drizaCercoD}` },
