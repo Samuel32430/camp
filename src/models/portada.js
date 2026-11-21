@@ -156,85 +156,45 @@ export function createPortadaYCercado() {
     portadaGroup.add(k);
   }
 
-  // ── Dos palos largos cruzados en diagonal ("X") formando el arco central ──
-  // Diagonal 1: Nace en base del trípode izquierdo (-2.30, 0.30) y sube hacia la cúspide derecha (+1.60, 3.60)
+  // ── Dos palos largos cruzados en diagonal ("X") formando el arco central superior ──
+  // Conectados desde la mitad del trípode (Y ≈ 1.45 m), cruzándose POR ENCIMA de la viga horizontal
+  // Diagonal 1: Nace en mitad del trípode izquierdo (-2.60, 1.45) y asciende hacia la derecha (+1.35, 4.35)
   const diag1 = createPioneerLogBetweenPoints(
-    new THREE.Vector3(-2.30, 0.30, 0.05),
-    new THREE.Vector3( 1.60, 3.65, 0.05),
-    logR * 0.92
+    new THREE.Vector3(-2.60, 1.45, 0.05),
+    new THREE.Vector3( 1.35, 4.35, 0.05),
+    logR * 0.90
   );
   portadaGroup.add(diag1);
 
-  // Diagonal 2: Nace en base del trípode derecho (+2.30, 0.30) y sube hacia la cúspide izquierda (-1.60, 3.60)
+  // Diagonal 2: Nace en mitad del trípode derecho (+2.60, 1.45) y asciende hacia la izquierda (-1.35, 4.35)
   const diag2 = createPioneerLogBetweenPoints(
-    new THREE.Vector3( 2.30, 0.30, -0.05),
-    new THREE.Vector3(-1.60, 3.65, -0.05),
-    logR * 0.92
+    new THREE.Vector3( 2.60, 1.45, -0.05),
+    new THREE.Vector3(-1.35, 4.35, -0.05),
+    logR * 0.90
   );
   portadaGroup.add(diag2);
 
-  // Amarre diagonal central donde se cruza la "X" (X = 0, Y = 2.95 m)
-  const crossKnot = new THREE.Mesh(new THREE.TorusGeometry(0.14, 0.05, 8, 16), ropeMat);
-  crossKnot.position.set(0, 2.95, 0);
-  crossKnot.rotation.y = Math.PI / 2;
-  portadaGroup.add(crossKnot);
+  // Amarres de las diagonales a media altura de los trípodes
+  for (const tx of [-2.60, 2.60]) {
+    const kTripod = new THREE.Mesh(new THREE.TorusGeometry(0.12, 0.035, 8, 16), ropeMat);
+    kTripod.position.set(tx, 1.45, 0);
+    kTripod.rotation.y = Math.PI / 2;
+    portadaGroup.add(kTripod);
+  }
 
-  // Amarres de las diagonales al cruzarse con el travesaño horizontal
-  for (const kx of [-1.15, 1.15]) {
-    const kDiag = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.20, 8), ropeMat);
+  // Amarres donde las diagonales cruzan la viga horizontal superior (X ≈ ±0.97 m, Y = 2.65 m)
+  for (const kx of [-0.97, 0.97]) {
+    const kDiag = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.22, 8), ropeMat);
     kDiag.rotation.z = Math.PI / 4 * (kx > 0 ? -1 : 1);
     kDiag.position.set(kx, tripodH - 0.15, 0);
     portadaGroup.add(kDiag);
   }
 
-  // ── Telas decorativas laterales (colores institucionales Club Orión) ────────
-  // A. Espacios interiores entre trípodes y vano central
-  // Tela interior izquierda: Azul Orión con franja verde y orla dorada
-  const telaIntIzqMat = new THREE.MeshStandardMaterial({
-    color: ORION_COLORS.azul,
-    side: THREE.DoubleSide,
-    roughness: 0.85
-  });
-  const telaIntIzq = new THREE.Mesh(new THREE.PlaneGeometry(0.95, 1.60), telaIntIzqMat);
-  telaIntIzq.position.set(-1.85, tripodH - 1.05, 0.04);
-  portadaGroup.add(telaIntIzq);
-
-  const franjaIntIzqMat = new THREE.MeshStandardMaterial({
-    color: ORION_COLORS.verde,
-    side: THREE.DoubleSide,
-    roughness: 0.85
-  });
-  const franjaIntIzq = new THREE.Mesh(new THREE.PlaneGeometry(0.20, 1.60), franjaIntIzqMat);
-  franjaIntIzq.position.set(-1.50, tripodH - 1.05, 0.05);
-  portadaGroup.add(franjaIntIzq);
-
-  // Tela interior derecha: Verde Orión con franja azul y orla dorada
-  const telaIntDerMat = new THREE.MeshStandardMaterial({
-    color: ORION_COLORS.verde,
-    side: THREE.DoubleSide,
-    roughness: 0.85
-  });
-  const telaIntDer = new THREE.Mesh(new THREE.PlaneGeometry(0.95, 1.60), telaIntDerMat);
-  telaIntDer.position.set(1.85, tripodH - 1.05, 0.04);
-  portadaGroup.add(telaIntDer);
-
-  const franjaIntDerMat = new THREE.MeshStandardMaterial({
-    color: ORION_COLORS.azul,
-    side: THREE.DoubleSide,
-    roughness: 0.85
-  });
-  const franjaIntDer = new THREE.Mesh(new THREE.PlaneGeometry(0.20, 1.60), franjaIntDerMat);
-  franjaIntDer.position.set(1.50, tripodH - 1.05, 0.05);
-  portadaGroup.add(franjaIntDer);
-
-  // B. Telas exteriores laterales (flanco exterior de los trípodes)
-  const telaExtIzq = new THREE.Mesh(new THREE.PlaneGeometry(0.85, 1.50), telaIntIzqMat);
-  telaExtIzq.position.set(-3.25, tripodH - 1.10, 0.04);
-  portadaGroup.add(telaExtIzq);
-
-  const telaExtDer = new THREE.Mesh(new THREE.PlaneGeometry(0.85, 1.50), telaIntDerMat);
-  telaExtDer.position.set(3.25, tripodH - 1.10, 0.04);
-  portadaGroup.add(telaExtDer);
+  // Amarre diagonal central donde se cruza la "X" (por encima de la viga horizontal en Y = 3.36 m)
+  const crossKnot = new THREE.Mesh(new THREE.TorusGeometry(0.14, 0.05, 8, 16), ropeMat);
+  crossKnot.position.set(0, 3.36, 0);
+  crossKnot.rotation.y = Math.PI / 2;
+  portadaGroup.add(crossKnot);
 
   // ── Letrero principal "CLUB ORIÓN" con logo en canvas ─────────────────────
   const signWoodMat = new THREE.MeshStandardMaterial({ color: 0x3b1f0a, roughness: 0.9 });
@@ -357,8 +317,8 @@ export function createPortadaYCercado() {
   }
 
   const mainSign = createClubOrionSign();
-  // Montado sobre la intersección de las diagonales cruzadas
-  mainSign.position.set(0, 3.25, 0.08);
+  // Montado en el vértice de las diagonales cruzadas por encima de la viga
+  mainSign.position.set(0, 3.55, 0.08);
   portadaGroup.add(mainSign);
 
   // ── Cotas 3D sobre la portada ─────────────────────────────────────────────
@@ -385,20 +345,20 @@ export function createPortadaYCercado() {
 
   // Cota de ANCHO (5.20 m entre trípodes)
   const cotaAnchoLine = new THREE.BufferGeometry().setFromPoints([
-    new THREE.Vector3(-2.6, 3.80, 0),
-    new THREE.Vector3( 2.6, 3.80, 0),
+    new THREE.Vector3(-2.6, 4.45, 0),
+    new THREE.Vector3( 2.6, 4.45, 0),
   ]);
   portadaGroup.add(new THREE.Line(cotaAnchoLine, cotaMat));
   // ticks
   for (const sx of [-2.6, 2.6]) {
     const t = new THREE.BufferGeometry().setFromPoints([
-      new THREE.Vector3(sx, 3.70, 0),
-      new THREE.Vector3(sx, 3.90, 0),
+      new THREE.Vector3(sx, 4.35, 0),
+      new THREE.Vector3(sx, 4.55, 0),
     ]);
     portadaGroup.add(new THREE.Line(t, cotaMat));
   }
   const labelAncho = makeLabel3D('↔ 5.20 m');
-  labelAncho.position.set(0, 4.05, 0);
+  labelAncho.position.set(0, 4.70, 0);
   portadaGroup.add(labelAncho);
 
   // Cota de ALTURA (3.00 m / 3.65 m cúspide)

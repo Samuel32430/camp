@@ -99,40 +99,21 @@ function createMastilConBandera(parentGroup, x, z, flagType = 'orion') {
       ctx.moveTo(stripeW * 2, 0); ctx.lineTo(stripeW * 2, 320);
       ctx.stroke();
     } else {
-      // ── Bandera Oficial del Club Orión
-      ctx.fillStyle = '#1a3a8f'; // Azul Orión superior
+      // ── Bandera Oficial del Club Orión (Fondo totalmente blanco, logo oficial al centro)
+      ctx.fillStyle = '#ffffff';
       ctx.fillRect(0, 0, 512, 320);
 
-      // Mitad inferior Verde Orión
-      ctx.fillStyle = '#1a7a3f';
-      ctx.fillRect(0, 160, 512, 160);
+      // Borde perimetral sutil
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(2, 2, 508, 316);
 
-      // Franja amarilla intermedia
-      ctx.fillStyle = '#f5c518';
-      ctx.fillRect(0, 150, 512, 20);
-
-      // Borde blanco institucional
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 8;
-      ctx.strokeRect(5, 5, 502, 310);
-
-      // Textos institucionales
-      ctx.fillStyle = '#f5c518';
-      ctx.font = 'bold 36px "Plus Jakarta Sans", sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText('CLUB DE CONQUISTADORES', 256, 52);
-
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '800 52px "Plus Jakarta Sans", sans-serif';
-      ctx.fillText('ORIÓN', 256, 106);
-
-      // Estrella central amarilla de 5 puntas
+      // Placeholder central mientras carga el logo
       ctx.save();
-      ctx.translate(256, 235);
+      ctx.translate(256, 160);
       ctx.beginPath();
       for (let i = 0; i < 5; i++) {
-        const rOuter = 55, rInner = 24;
+        const rOuter = 65, rInner = 28;
         const a = -Math.PI / 2 + (i * 2 * Math.PI / 5);
         const aI = a + Math.PI / 5;
         if (i === 0) ctx.moveTo(Math.cos(a) * rOuter, Math.sin(a) * rOuter);
@@ -142,8 +123,8 @@ function createMastilConBandera(parentGroup, x, z, flagType = 'orion') {
       ctx.closePath();
       ctx.fillStyle = '#f5c518';
       ctx.fill();
-      ctx.strokeStyle = '#c8a000';
-      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = '#1a3a8f';
+      ctx.lineWidth = 3;
       ctx.stroke();
       ctx.restore();
     }
@@ -154,16 +135,33 @@ function createMastilConBandera(parentGroup, x, z, flagType = 'orion') {
   const flagTex = new THREE.CanvasTexture(canvas);
   flagTex.minFilter = THREE.LinearFilter;
 
-  // Carga asíncrona del logo para la bandera del Club Orión
+  // Carga del logo oficial: centrado sobre fondo blanco rectangular
   if (flagType === 'orion') {
     const imgLogo = new Image();
     imgLogo.crossOrigin = 'anonymous';
     imgLogo.src = '/logo-orion.png';
-    imgLogo.onload = () => {
-      drawFlagDesign();
-      ctx.drawImage(imgLogo, 206, 185, 100, 100);
+    const renderLogo = () => {
+      // Limpiar con fondo blanco
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, 512, 320);
+
+      // Borde sutil
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(2, 2, 508, 316);
+
+      // Logo al centro del rectángulo
+      const size = 265;
+      const lx = (512 - size) / 2;
+      const ly = (320 - size) / 2;
+      ctx.drawImage(imgLogo, lx, ly, size, size);
       flagTex.needsUpdate = true;
     };
+
+    imgLogo.onload = renderLogo;
+    if (imgLogo.complete) {
+      renderLogo();
+    }
   }
 
   const flagMat = new THREE.MeshStandardMaterial({
