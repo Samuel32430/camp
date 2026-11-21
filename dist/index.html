@@ -7,11 +7,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-  <script type="module" crossorigin src="/assets/index-CYGY5kdd.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index-f4q01rPv.css">
+  <script type="module" crossorigin src="/assets/index-Bfm-CrMg.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-D_hjBMpq.css">
 </head>
 <body>
   <div id="canvas-container"></div>
+
+  <!-- Telón de fondo para cerrar el panel lateral en móvil al tocar fuera -->
+  <div id="sidebar-backdrop" class="sidebar-backdrop hidden"></div>
 
   <button id="btn-open-sidebar" class="btn-open-sidebar hidden" title="Mostrar Panel de Control">
     Menú y Vistas
@@ -23,7 +26,10 @@
         <img src="/logo-orion.png" alt="Club Orión" class="logo-img">
       </div>
       <div>
-        <h1 class="header-title">Club Orión - Distribución de Campamento</h1>
+        <h1 class="header-title">
+          <span class="title-full">Club Orión - Distribución de Campamento</span>
+          <span class="title-mobile">Club Orión</span>
+        </h1>
         <div class="header-badges">
           <span class="badge badge-accent">20.00 m × 18.00 m (360 m²)</span>
           <span class="badge">25 Carpas</span>
@@ -38,7 +44,9 @@
         <button id="btn-time-sunset" class="btn-time" title="Atardecer">Atardecer</button>
         <button id="btn-time-night" class="btn-time" title="Noche">Noche</button>
       </div>
-      <button id="btn-fullscreen" class="btn-fullscreen" title="Pantalla Completa">⛶ Pantalla Completa</button>
+      <button id="btn-fullscreen" class="btn-fullscreen" title="Pantalla Completa">
+        <span class="fs-icon">⛶</span><span class="fs-text"> Pantalla Completa</span>
+      </button>
     </div>
   </header>
 
@@ -148,20 +156,32 @@
   </div>
 
   <footer class="hud-footer glass-panel">
-    <div class="footer-hint">
+    <!-- Instrucciones de escritorio (ratón / teclado) -->
+    <div class="footer-hint desktop-only">
       <span class="hint-key">Clic + Arrastrar:</span> Rotar órbita
     </div>
-    <div class="footer-hint">
+    <div class="footer-hint desktop-only">
       <span class="hint-key">Rueda:</span> Zoom
     </div>
-    <div class="footer-hint">
+    <div class="footer-hint desktop-only">
       <span class="hint-key">Clic en elemento:</span> Ver medidas
     </div>
-    <div class="footer-hint">
+    <div class="footer-hint desktop-only">
       <span class="hint-key">Espacio:</span> Auto-rotar
     </div>
-    <div class="footer-hint">
-      <span class="hint-key">Tecla H:</span> Ocultar/Mostrar menú
+    <div class="footer-hint desktop-only">
+      <span class="hint-key">Tecla H:</span> Menú
+    </div>
+
+    <!-- Instrucciones móviles (pantalla táctil) -->
+    <div class="footer-hint touch-only">
+      <span class="hint-key">1 dedo:</span> Rotar
+    </div>
+    <div class="footer-hint touch-only">
+      <span class="hint-key">2 dedos:</span> Zoom
+    </div>
+    <div class="footer-hint touch-only">
+      <span class="hint-key">Tocar carpa:</span> Ver detalles
     </div>
   </footer>
 
