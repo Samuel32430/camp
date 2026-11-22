@@ -332,14 +332,6 @@ export function setupHUD({
     openModalTab('tab-distribucion');
   });
 
-  document.getElementById('btn-show-qr')?.addEventListener('click', () => {
-    openModalTab('tab-qr');
-  });
-
-  document.getElementById('btn-open-qr')?.addEventListener('click', () => {
-    openModalTab('tab-qr');
-  });
-
   btnCloseModal?.addEventListener('click', closeModal);
 
   modalBackdrop?.addEventListener('click', (e) => {
