@@ -7,7 +7,7 @@
 
 :root {
   --bg-dark: #0b0f17;
-  --panel-bg: rgba(15, 23, 42, 0.88);
+  --panel-bg: rgba(11, 18, 33, 0.92);
   --panel-border: rgba(255, 255, 255, 0.12);
   --panel-hover: rgba(255, 255, 255, 0.08);
   --text-main: #f1f5f9;
@@ -47,8 +47,8 @@ body {
 /* Glassmorphism Panel Shared */
 .glass-panel {
   background: var(--panel-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 1px solid var(--panel-border);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
   border-radius: 12px;
@@ -83,8 +83,9 @@ body {
   top: 86px;
   left: 16px;
   z-index: 15;
-  background: rgba(15, 23, 42, 0.95);
-  backdrop-filter: blur(12px);
+  background: rgba(11, 18, 33, 0.95);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   border: 1px solid var(--accent);
   color: var(--accent);
   padding: 8px 14px;
@@ -659,6 +660,12 @@ body {
    ========================================================= */
 
 @media (max-width: 768px) {
+  /* Optimización GPU móvil: reducción drástica de blur sobre el canvas WebGL */
+  .glass-panel {
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+  }
+
   /* Fondo oscuro tipo backdrop para Drawer en móvil */
   .sidebar-backdrop {
     display: block;

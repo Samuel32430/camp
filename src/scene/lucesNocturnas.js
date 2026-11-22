@@ -65,17 +65,15 @@ export function createLucesNocturnas() {
     group.add(line);
   });
 
-  // 2. Luces puntuales cálidas bajo la cubierta
+  // 2. Luces puntuales cálidas bajo la cubierta (iluminación ambiental difusa sin sombras costosas)
   const pointLights = [];
   const lightZPositions = [6.5, 2.5, -1.0, -4.0];
 
   lightZPositions.forEach((z, idx) => {
     const pl = new THREE.PointLight(0xffaa33, 0.0, 8.5, 1.8);
     pl.position.set(idx % 2 === 0 ? -0.8 : 0.8, 2.85, z);
-    pl.castShadow = true;
-    pl.shadow.bias = -0.002;
-    pl.shadow.mapSize.width = 512;
-    pl.shadow.mapSize.height = 512;
+    // Optimización: castShadow = false elimina 24 pases de sombra cubemap por frame
+    pl.castShadow = false;
     group.add(pl);
     pointLights.push(pl);
   });
